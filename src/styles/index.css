@@ -122,7 +122,7 @@ a {
   height: 3.2rem;
   background-image: url("../assets/cloud.svg");
   background-repeat: repeat-x;
-  background-position: center -0.25rem;
+  background-position: center -0.125rem;
   background-size: 48rem 3.2rem;
   content: "";
   pointer-events: none;
