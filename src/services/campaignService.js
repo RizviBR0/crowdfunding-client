@@ -62,6 +62,23 @@ export const getPublicCampaign = async (campaignId) => {
   return response.data.data.campaign
 }
 
+export const createContribution = async ({ campaignId, amount, message = '', idempotencyKey }) => {
+  const response = await apiClient.post(
+    `/campaigns/${campaignId}/contributions`,
+    {
+      amount,
+      ...(message ? { message } : {}),
+    },
+    {
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+    },
+  )
+
+  return response.data.data.contribution
+}
+
 export const getAdminCampaigns = async ({ status = 'pending', search = '', page = 1, limit = 10 } = {}) => {
   const response = await apiClient.get('/admin/campaigns', {
     params: { status, search, page, limit },

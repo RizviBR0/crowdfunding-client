@@ -67,6 +67,12 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  const refreshUser = useCallback(async () => {
+    const restoredUser = await restoreSession()
+    setUser(restoredUser)
+    return restoredUser
+  }, [])
+
   const value = useMemo(
     () => ({
       user,
@@ -76,6 +82,7 @@ export function AuthProvider({ children }) {
       registerWithEmail: (payload) => runAuthAction(() => registerWithEmailRequest(payload)),
       loginWithEmail: (payload) => runAuthAction(() => loginWithEmailRequest(payload)),
       loginWithGoogle: (payload) => runAuthAction(() => loginWithGoogleRequest(payload)),
+      refreshUser,
       logout: async () => {
         setIsAuthLoading(true)
 
@@ -88,7 +95,7 @@ export function AuthProvider({ children }) {
         }
       },
     }),
-    [isAuthLoading, isAuthRestored, runAuthAction, user],
+    [isAuthLoading, isAuthRestored, refreshUser, runAuthAction, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ArrowLeft,
   ArrowRight,
@@ -28,7 +28,8 @@ import mobileClinicSupport from '../assets/mobile-clinic-support.png'
 import robotPrototype from '../assets/robot-prototype.png'
 import EmptyState from '../components/ui/EmptyState.jsx'
 import LoadingState from '../components/ui/LoadingState.jsx'
-import { getPublicCampaign, getPublicCampaigns } from '../services/campaignService.js'
+import { getApiErrorMessage } from '../lib/api.js'
+import { createContribution, getPublicCampaign, getPublicCampaigns } from '../services/campaignService.js'
 
 const categories = ['All', 'Technology', 'Arts & Culture', 'Education', 'Health', 'Community', 'Environment']
 const fallbackImages = [
@@ -69,6 +70,14 @@ const readFilters = (searchParams) => ({
   goalMin: searchParams.get('goalMin') || '',
   goalMax: searchParams.get('goalMax') || '',
 })
+
+const createIdempotencyKey = () => {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID()
+  }
+
+  return `contribution-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
 
 function CampaignCard({ campaign, index }) {
   const progress = getProgress(campaign)
@@ -262,7 +271,11 @@ function ExplorePage({ surface = 'public' }) {
 
 export function CampaignDetailPage() {
   const { campaignId } = useParams()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, refreshUser, user } = useAuth()
+  const queryClient = useQueryClient()
+  const [amount, setAmount] = useState('')
+  const [message, setMessage] = useState('')
+  const [successContribution, setSuccessContribution] = useState(null)
   const query = useQuery({
     queryKey: ['public-campaign', campaignId],
     queryFn: () => getPublicCampaign(campaignId),
@@ -271,6 +284,48 @@ export function CampaignDetailPage() {
   const campaign = query.data
   const progress = getProgress(campaign)
   const canContribute = isAuthenticated && user?.role === 'supporter'
+  const contributionAmount = Number(amount)
+  const minimumContribution = campaign?.minimumContribution ?? 1
+  const availableCredits = user?.credits ?? 0
+  const visibleRemaining = Math.max((campaign?.fundingGoal ?? 0) - (campaign?.amountRaised ?? 0), 0)
+  const amountIsInteger = Number.isInteger(contributionAmount)
+  const amountIsValid =
+    amount !== '' &&
+    amountIsInteger &&
+    contributionAmount >= minimumContribution &&
+    contributionAmount <= availableCredits &&
+    visibleRemaining > 0 &&
+    contributionAmount <= visibleRemaining
+  const contributionMutation = useMutation({
+    mutationFn: () =>
+      createContribution({
+        campaignId,
+        amount: contributionAmount,
+        message: message.trim(),
+        idempotencyKey: createIdempotencyKey(),
+      }),
+    onSuccess: async (contribution) => {
+      setSuccessContribution(contribution)
+      setAmount('')
+      setMessage('')
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['public-campaign', campaignId] }),
+        queryClient.invalidateQueries({ queryKey: ['public-campaigns'] }),
+        refreshUser?.(),
+      ])
+    },
+  })
+
+  const submitContribution = (event) => {
+    event.preventDefault()
+    setSuccessContribution(null)
+
+    if (!amountIsValid || contributionMutation.isPending) {
+      return
+    }
+
+    contributionMutation.mutate()
+  }
 
   if (query.isLoading) {
     return (
@@ -372,15 +427,67 @@ export function CampaignDetailPage() {
           </p>
           <h2 id="contribution-title">Contribution amount</h2>
           {canContribute ? (
-            <form>
+            <form onSubmit={submitContribution}>
+              <div className="contribution-panel__balance" aria-label="Supporter credit balance">
+                <span>Available credits</span>
+                <strong>{formatCredits(availableCredits)}</strong>
+              </div>
               <label>
                 <span>Credits to contribute</span>
-                <input min={campaign.minimumContribution ?? 1} placeholder={campaign.minimumContribution} type="number" />
+                <input
+                  min={minimumContribution}
+                  onChange={(event) => setAmount(event.target.value)}
+                  placeholder={minimumContribution}
+                  step="1"
+                  type="number"
+                  value={amount}
+                />
               </label>
-              <button className="button button--primary" disabled type="button">
-                Contribution opens next
+              <label>
+                <span>Message to creator</span>
+                <textarea
+                  maxLength={800}
+                  onChange={(event) => setMessage(event.target.value)}
+                  placeholder="Share why this campaign matters to you."
+                  value={message}
+                />
+              </label>
+              <p className="contribution-panel__hint">
+                Minimum {formatCredits(minimumContribution)} credits. Publicly visible remaining room is{' '}
+                {formatCredits(visibleRemaining)} credits; the server also accounts for pending reserved support.
+              </p>
+              {amount !== '' && !amountIsInteger ? (
+                <p className="form-message form-message--error">Contribution credits must be a whole number.</p>
+              ) : null}
+              {amount !== '' && amountIsInteger && contributionAmount < minimumContribution ? (
+                <p className="form-message form-message--error">
+                  Contribution must be at least {formatCredits(minimumContribution)} credits.
+                </p>
+              ) : null}
+              {amount !== '' && amountIsInteger && contributionAmount > availableCredits ? (
+                <p className="form-message form-message--error">
+                  Add credits before contributing more than your current balance.
+                </p>
+              ) : null}
+              {amount !== '' && amountIsInteger && visibleRemaining > 0 && contributionAmount > visibleRemaining ? (
+                <p className="form-message form-message--error">
+                  This amount is above the campaign's visible remaining goal.
+                </p>
+              ) : null}
+              {visibleRemaining <= 0 ? (
+                <p className="form-message form-message--error">This campaign has reached its visible funding goal.</p>
+              ) : null}
+              {contributionMutation.isError ? (
+                <p className="form-message form-message--error">{getApiErrorMessage(contributionMutation.error)}</p>
+              ) : null}
+              {successContribution ? (
+                <p className="form-message form-message--success">
+                  Your {formatCredits(successContribution.amount)} credit contribution is pending creator review.
+                </p>
+              ) : null}
+              <button className="button button--primary" disabled={!amountIsValid || contributionMutation.isPending} type="submit">
+                {contributionMutation.isPending ? 'Sending contribution...' : 'Support This Project'}
               </button>
-              <p>The server contribution flow is the next vertical task, so this form is staged for that endpoint.</p>
             </form>
           ) : (
             <div className="contribution-panel__locked">

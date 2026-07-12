@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { apiClient } from '../lib/api.js'
 import {
   createCampaign,
+  createContribution,
   decideAdminCampaign,
   deleteAdminCampaign,
   deleteCampaign,
@@ -122,6 +123,46 @@ describe('campaign service', () => {
       },
     })
     expect(apiClient.get).toHaveBeenNthCalledWith(2, '/campaigns/campaign_1')
+  })
+
+  it('creates supporter contributions with an idempotency key header', async () => {
+    apiClient.post.mockResolvedValue({
+      data: {
+        data: {
+          contribution: {
+            id: 'contribution_1',
+            amount: 75,
+            status: 'pending',
+          },
+        },
+      },
+    })
+
+    await expect(
+      createContribution({
+        campaignId: 'campaign_1',
+        amount: 75,
+        message: 'Happy to support.',
+        idempotencyKey: 'contribution-key-1',
+      }),
+    ).resolves.toEqual({
+      id: 'contribution_1',
+      amount: 75,
+      status: 'pending',
+    })
+
+    expect(apiClient.post).toHaveBeenCalledWith(
+      '/campaigns/campaign_1/contributions',
+      {
+        amount: 75,
+        message: 'Happy to support.',
+      },
+      {
+        headers: {
+          'Idempotency-Key': 'contribution-key-1',
+        },
+      },
+    )
   })
 
   it('loads and mutates admin campaign records', async () => {

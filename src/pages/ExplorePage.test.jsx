@@ -5,7 +5,7 @@ import App from '../App.jsx'
 import AppProviders from '../app/AppProviders.jsx'
 import { ACCESS_TOKEN_KEY } from '../lib/tokenStorage.js'
 import { restoreSession } from '../services/authService.js'
-import { getPublicCampaign, getPublicCampaigns } from '../services/campaignService.js'
+import { createContribution, getPublicCampaign, getPublicCampaigns } from '../services/campaignService.js'
 
 vi.mock('../services/authService.js', () => ({
   loginWithEmail: vi.fn(),
@@ -20,6 +20,7 @@ vi.mock('../services/campaignService.js', async () => {
 
   return {
     ...actual,
+    createContribution: vi.fn(),
     getPublicCampaign: vi.fn(),
     getPublicCampaigns: vi.fn(),
   }
@@ -129,15 +130,56 @@ describe('Explore campaign pages', () => {
     })
   })
 
-  it('shows campaign details with supporter-only contribution controls', async () => {
+  it('creates a supporter contribution from campaign details and refreshes session data', async () => {
+    const user = userEvent.setup()
     getPublicCampaign.mockResolvedValue(detailCampaign)
+    createContribution.mockResolvedValue({
+      id: 'contribution_1',
+      amount: 50,
+      status: 'pending',
+    })
 
     renderAt('/campaigns/campaign_1', supporterUser)
 
     expect(await screen.findByRole('heading', { name: /community robotics lab/i })).toBeInTheDocument()
     expect(screen.getByText(/young learners build/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/credits to contribute/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /contribution opens next/i })).toBeDisabled()
+    expect(screen.getByLabelText(/supporter credit balance/i)).toHaveTextContent('75')
+
+    await user.type(screen.getByLabelText(/credits to contribute/i), '50')
+    await user.type(screen.getByLabelText(/message to creator/i), 'This will help students learn.')
+    await user.click(screen.getByRole('button', { name: /support this project/i }))
+
+    await waitFor(() => {
+      expect(createContribution).toHaveBeenCalledWith({
+        campaignId: 'campaign_1',
+        amount: 50,
+        message: 'This will help students learn.',
+        idempotencyKey: expect.any(String),
+      })
+    })
+    expect(await screen.findByText(/50 credit contribution is pending creator review/i)).toBeInTheDocument()
+    expect(restoreSession).toHaveBeenCalledTimes(2)
+  })
+
+  it('disables invalid contribution amounts before submit', async () => {
+    const user = userEvent.setup()
+    getPublicCampaign.mockResolvedValue(detailCampaign)
+
+    renderAt('/campaigns/campaign_1', supporterUser)
+
+    await screen.findByRole('heading', { name: /community robotics lab/i })
+    const submit = screen.getByRole('button', { name: /support this project/i })
+
+    expect(submit).toBeDisabled()
+    await user.type(screen.getByLabelText(/credits to contribute/i), '10')
+    expect(screen.getByText(/at least 25 credits/i)).toBeInTheDocument()
+    expect(submit).toBeDisabled()
+
+    await user.clear(screen.getByLabelText(/credits to contribute/i))
+    await user.type(screen.getByLabelText(/credits to contribute/i), '100')
+    expect(screen.getByText(/current balance/i)).toBeInTheDocument()
+    expect(submit).toBeDisabled()
+    expect(createContribution).not.toHaveBeenCalled()
   })
 
   it('uses the same campaign discovery inside the supporter dashboard', async () => {

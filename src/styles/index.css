@@ -2511,7 +2511,8 @@ input:focus-visible {
 
 .explore-filters input,
 .explore-filters select,
-.contribution-panel input {
+.contribution-panel input,
+.contribution-panel textarea {
   width: 100%;
   min-width: 0;
   border: 1px solid rgba(111, 80, 143, 0.16);
@@ -2526,7 +2527,8 @@ input:focus-visible {
 
 .explore-filters input:focus,
 .explore-filters select:focus,
-.contribution-panel input:focus {
+.contribution-panel input:focus,
+.contribution-panel textarea:focus {
   border-color: rgba(145, 69, 247, 0.58);
   box-shadow: 0 0 0 4px rgba(145, 69, 247, 0.12);
 }
@@ -2756,6 +2758,61 @@ input:focus-visible {
   display: grid;
   gap: 0.9rem;
   margin-top: 1rem;
+}
+
+.contribution-panel textarea {
+  min-height: 7rem;
+  border-radius: var(--radius-soft);
+  font-weight: 700;
+  resize: vertical;
+}
+
+.contribution-panel__balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(145, 69, 247, 0.16);
+  border-radius: var(--radius-soft);
+  background: #fbf5ff;
+}
+
+.contribution-panel__balance span,
+.contribution-panel__hint {
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.contribution-panel__balance strong {
+  color: var(--purple-deep);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.contribution-panel__hint {
+  margin: 0;
+}
+
+.form-message {
+  margin: 0;
+  border-radius: var(--radius-soft);
+  padding: 0.75rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.form-message--error {
+  background: #fff0f5;
+  color: #ad244d;
+}
+
+.form-message--success {
+  background: #e9fff5;
+  color: #137a4c;
 }
 
 .contribution-panel__locked .button {
