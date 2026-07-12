@@ -28,3 +28,37 @@ export const deleteCampaign = async (campaignId) => {
 
   return response.data.data
 }
+
+export const getAdminCampaigns = async ({ status = 'pending', search = '', page = 1, limit = 10 } = {}) => {
+  const response = await apiClient.get('/admin/campaigns', {
+    params: { status, search, page, limit },
+  })
+
+  return {
+    campaigns: response.data.data.campaigns,
+    meta: response.data.meta,
+  }
+}
+
+export const decideAdminCampaign = async ({ campaignId, decision, reason }) => {
+  const response = await apiClient.patch(`/admin/campaigns/${campaignId}/decision`, {
+    decision,
+    ...(reason ? { reason } : {}),
+  })
+
+  return response.data.data.campaign
+}
+
+export const suspendAdminCampaign = async ({ campaignId, reason }) => {
+  const response = await apiClient.patch(`/admin/campaigns/${campaignId}/suspend`, { reason })
+
+  return response.data.data.campaign
+}
+
+export const deleteAdminCampaign = async ({ campaignId, reason }) => {
+  const response = await apiClient.delete(`/admin/campaigns/${campaignId}`, {
+    data: reason ? { reason } : {},
+  })
+
+  return response.data.data
+}

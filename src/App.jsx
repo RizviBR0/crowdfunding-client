@@ -4,6 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout.jsx'
 import PublicLayout from './layouts/PublicLayout.jsx'
 import AuthPage from './pages/AuthPage.jsx'
 import { DashboardHomePage, DashboardPlaceholderPage } from './pages/DashboardPage.jsx'
+import AdminCampaignPage from './pages/AdminCampaignPage.jsx'
 import CreatorCampaignPage from './pages/CreatorCampaignPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
@@ -47,7 +48,7 @@ function App() {
           <Route element={<RoleRoute allowedRole="admin" />}>
             <Route element={<DashboardHomePage role="admin" />} path="admin" />
             <Route element={<DashboardPlaceholderPage type="adminUsers" />} path="admin/users" />
-            <Route element={<DashboardPlaceholderPage type="adminCampaigns" />} path="admin/campaigns" />
+            <Route element={<AdminCampaignPage />} path="admin/campaigns" />
             <Route element={<DashboardPlaceholderPage type="adminWithdrawals" />} path="admin/withdrawals" />
             <Route element={<DashboardPlaceholderPage type="adminReports" />} path="admin/reports" />
           </Route>

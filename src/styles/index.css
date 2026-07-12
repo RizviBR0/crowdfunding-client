@@ -1534,6 +1534,7 @@ a {
 .dashboard-page--placeholder {
   position: relative;
   overflow: hidden;
+  min-width: 0;
   border: 1px solid rgba(111, 80, 143, 0.14);
   border-radius: var(--radius-card);
   background:
@@ -1563,12 +1564,14 @@ a {
   font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3.5rem);
   line-height: 1.16;
+  overflow-wrap: anywhere;
 }
 
 .dashboard-page p {
   max-width: 42rem;
   margin: 0.9rem 0 0;
   color: var(--text-soft);
+  overflow-wrap: anywhere;
 }
 
 .dashboard-page .button {
@@ -1748,6 +1751,10 @@ a {
   font-weight: 800;
 }
 
+.campaign-title-cell--compact {
+  min-width: 12rem;
+}
+
 .campaign-row-actions {
   display: inline-flex;
   gap: 0.45rem;
@@ -1774,6 +1781,119 @@ a {
 }
 
 .campaign-delete {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-campaign-workspace .table-shell {
+  border: 1px solid rgba(111, 80, 143, 0.14);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-campaign-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+  gap: 1rem;
+}
+
+.admin-campaign-hero > div {
+  min-width: 0;
+}
+
+.admin-campaign-summary {
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid rgba(145, 69, 247, 0.16);
+  border-radius: var(--radius-card);
+  background: linear-gradient(135deg, #fff7cf, #fff);
+}
+
+.admin-campaign-summary strong {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  line-height: 1;
+}
+
+.admin-campaign-summary span,
+.admin-campaign-summary small {
+  color: var(--text-soft);
+  font-weight: 900;
+}
+
+.admin-campaign-toolbar {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid rgba(111, 80, 143, 0.14);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-status-tabs {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+}
+
+.admin-status-tabs__button {
+  flex: 0 0 auto;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(145, 69, 247, 0.18);
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--text-soft);
+  font-weight: 900;
+}
+
+.admin-status-tabs__button--active,
+.admin-status-tabs__button:hover {
+  background: var(--purple-soft);
+  color: var(--purple-deep);
+}
+
+.admin-campaign-search {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.admin-campaign-search label,
+.admin-action-form label {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+  font-weight: 900;
+}
+
+.admin-campaign-search label {
+  flex: 1 1 18rem;
+}
+
+.admin-campaign-search input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(111, 80, 143, 0.16);
+  border-radius: var(--radius-pill);
+  padding: 0.85rem 1rem;
+  font: inherit;
+}
+
+.admin-campaign-actions button:first-child svg {
+  color: var(--success);
+}
+
+.admin-campaign-actions button:last-child svg {
+  color: var(--attention);
+}
+
+.admin-action-form {
   display: grid;
   gap: 1rem;
 }
@@ -2473,6 +2593,14 @@ input:focus-visible {
 
   .dashboard-stat-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-campaign-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-campaign-search {
+    display: grid;
   }
 
   .dashboard-footer {
