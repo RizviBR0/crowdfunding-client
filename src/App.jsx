@@ -4,6 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout.jsx'
 import PublicLayout from './layouts/PublicLayout.jsx'
 import AuthPage from './pages/AuthPage.jsx'
 import { DashboardHomePage, DashboardPlaceholderPage } from './pages/DashboardPage.jsx'
+import CreatorCampaignPage from './pages/CreatorCampaignPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
@@ -38,8 +39,8 @@ function App() {
           </Route>
           <Route element={<RoleRoute allowedRole="creator" />}>
             <Route element={<DashboardHomePage role="creator" />} path="creator" />
-            <Route element={<DashboardPlaceholderPage type="creatorNewCampaign" />} path="creator/campaigns/new" />
-            <Route element={<DashboardPlaceholderPage type="creatorCampaigns" />} path="creator/campaigns" />
+            <Route element={<CreatorCampaignPage mode="new" />} path="creator/campaigns/new" />
+            <Route element={<CreatorCampaignPage mode="list" />} path="creator/campaigns" />
             <Route element={<DashboardPlaceholderPage type="creatorWithdrawals" />} path="creator/withdrawals" />
             <Route element={<DashboardPlaceholderPage type="creatorPayments" />} path="creator/payments" />
           </Route>
