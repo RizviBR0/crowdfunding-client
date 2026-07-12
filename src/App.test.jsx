@@ -19,6 +19,10 @@ describe('public layout shell', () => {
 
     expect(screen.getAllByRole('link', { name: /fundbloom home/i }).length).toBeGreaterThan(1)
     expect(screen.getByRole('heading', { name: /fund the ideas/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /explore the most supported ideas/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /simple steps/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /find the causes that inspire you/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /what supporters are saying/i })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /explore campaigns/i }).length).toBeGreaterThan(1)
     expect(screen.getByRole('link', { name: /login/i })).toHaveAttribute('href', '/login')
     expect(screen.getByRole('link', { name: /register/i })).toHaveAttribute('href', '/register')
