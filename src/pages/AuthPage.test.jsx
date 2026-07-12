@@ -10,6 +10,7 @@ vi.mock('../services/authService.js', () => ({
   loginWithGoogle: vi.fn(),
   logout: vi.fn(),
   registerWithEmail: vi.fn(),
+  restoreSession: vi.fn(),
 }))
 
 describe('auth pages', () => {
@@ -59,7 +60,7 @@ describe('auth pages', () => {
     expect(registerWithEmail).not.toHaveBeenCalled()
   })
 
-  it('submits valid registration data and routes to the dashboard placeholder', async () => {
+  it('submits valid registration data and routes to the creator dashboard', async () => {
     const user = userEvent.setup()
     registerWithEmail.mockResolvedValue({
       displayName: 'Asha Bloom',
@@ -91,6 +92,6 @@ describe('auth pages', () => {
         role: 'creator',
       }),
     )
-    expect(await screen.findByRole('heading', { name: /your dashboard is getting ready/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /prepare campaigns for real support/i })).toBeInTheDocument()
   })
 })

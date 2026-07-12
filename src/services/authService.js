@@ -10,6 +10,12 @@ import { getFirebaseAuth, getGoogleProvider } from '../lib/firebase.js'
 import { clearAccessToken, saveAccessToken } from '../lib/tokenStorage.js'
 import { uploadProfileImage } from './imageUpload.js'
 
+export const restoreSession = async () => {
+  const response = await apiClient.get('/auth/me')
+
+  return response.data.data.user
+}
+
 export const exchangeSession = async ({ firebaseUser, intendedRole }) => {
   const firebaseIdToken = await firebaseUser.getIdToken()
   const response = await apiClient.post('/auth/session', {

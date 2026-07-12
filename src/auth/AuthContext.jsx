@@ -1,17 +1,60 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   loginWithEmail as loginWithEmailRequest,
   loginWithGoogle as loginWithGoogleRequest,
   logout as logoutRequest,
   registerWithEmail as registerWithEmailRequest,
+  restoreSession,
 } from '../services/authService.js'
+import { clearAccessToken, getAccessToken } from '../lib/tokenStorage.js'
 import { AuthContext } from './authContext.js'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [isAuthLoading, setIsAuthLoading] = useState(false)
+  const [isAuthLoading, setIsAuthLoading] = useState(() => Boolean(getAccessToken()))
+  const [isAuthRestored, setIsAuthRestored] = useState(() => !getAccessToken())
 
-  const runAuthAction = async (action) => {
+  useEffect(() => {
+    let isMounted = true
+    const accessToken = getAccessToken()
+
+    if (!accessToken) {
+      return () => {
+        isMounted = false
+      }
+    }
+
+    const restore = async () => {
+      setIsAuthLoading(true)
+
+      try {
+        const restoredUser = await restoreSession()
+
+        if (isMounted) {
+          setUser(restoredUser)
+        }
+      } catch {
+        clearAccessToken()
+
+        if (isMounted) {
+          setUser(null)
+        }
+      } finally {
+        if (isMounted) {
+          setIsAuthLoading(false)
+          setIsAuthRestored(true)
+        }
+      }
+    }
+
+    restore()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const runAuthAction = useCallback(async (action) => {
     setIsAuthLoading(true)
 
     try {
@@ -20,14 +63,16 @@ export function AuthProvider({ children }) {
       return nextUser
     } finally {
       setIsAuthLoading(false)
+      setIsAuthRestored(true)
     }
-  }
+  }, [])
 
   const value = useMemo(
     () => ({
       user,
       isAuthenticated: Boolean(user),
       isAuthLoading,
+      isAuthRestored,
       registerWithEmail: (payload) => runAuthAction(() => registerWithEmailRequest(payload)),
       loginWithEmail: (payload) => runAuthAction(() => loginWithEmailRequest(payload)),
       loginWithGoogle: (payload) => runAuthAction(() => loginWithGoogleRequest(payload)),
@@ -39,10 +84,11 @@ export function AuthProvider({ children }) {
           setUser(null)
         } finally {
           setIsAuthLoading(false)
+          setIsAuthRestored(true)
         }
       },
     }),
-    [isAuthLoading, user],
+    [isAuthLoading, isAuthRestored, runAuthAction, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

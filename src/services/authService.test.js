@@ -10,6 +10,7 @@ vi.mock('../lib/firebase.js', () => ({
 
 vi.mock('../lib/api.js', () => ({
   apiClient: {
+    get: vi.fn(),
     post: vi.fn(),
   },
 }))

@@ -40,4 +40,27 @@ export const siteConfig = {
     { label: 'LinkedIn', href: import.meta.env.VITE_LINKEDIN_URL || 'https://www.linkedin.com/', shortLabel: 'in' },
     { label: 'Facebook', href: import.meta.env.VITE_FACEBOOK_URL || 'https://www.facebook.com/', shortLabel: 'f' },
   ],
+  dashboardNavigation: {
+    supporter: [
+      { label: 'Home', href: '/dashboard/supporter' },
+      { label: 'Explore Campaigns', href: '/dashboard/supporter/explore' },
+      { label: 'My Contributions', href: '/dashboard/supporter/contributions' },
+      { label: 'Purchase Credit', href: '/dashboard/supporter/credits' },
+      { label: 'Payment History', href: '/dashboard/supporter/payments' },
+    ],
+    creator: [
+      { label: 'Home', href: '/dashboard/creator' },
+      { label: 'Add New Campaign', href: '/dashboard/creator/campaigns/new' },
+      { label: 'My Campaigns', href: '/dashboard/creator/campaigns' },
+      { label: 'Withdrawals', href: '/dashboard/creator/withdrawals' },
+      { label: 'Payment History', href: '/dashboard/creator/payments' },
+    ],
+    admin: [
+      { label: 'Home', href: '/dashboard/admin' },
+      { label: 'Manage Users', href: '/dashboard/admin/users' },
+      { label: 'Manage Campaigns', href: '/dashboard/admin/campaigns' },
+      { label: 'Withdrawal Requests', href: '/dashboard/admin/withdrawals' },
+      { label: 'Reports', href: '/dashboard/admin/reports' },
+    ],
+  },
 }
