@@ -107,33 +107,40 @@ a {
   position: sticky;
   top: 0;
   z-index: 20;
+  overflow: visible;
   background: #fff;
   border-bottom: 0;
   backdrop-filter: blur(18px);
+  isolation: isolate;
 }
 
 .site-header::after {
   position: absolute;
-  right: 0;
-  bottom: -3.05rem;
-  left: 0;
+  bottom: -3rem;
+  left: 50%;
+  width: 100vw;
   height: 3.1rem;
   background-image: url("../assets/cloud.svg");
-  background-repeat: no-repeat;
+  background-repeat: repeat-x;
   background-position: top center;
-  background-size: max(48rem, 100%) 3.1rem;
+  background-size: 48rem 3.1rem;
   content: "";
   pointer-events: none;
+  transform: translateX(-50%);
+  z-index: 0;
 }
 
 .site-nav {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  width: min(calc(100% - 2rem), var(--max-width));
+  width: min(calc(100% - 4rem), var(--max-width));
   min-height: 5.75rem;
   margin: 0 auto;
+  padding: 0.35rem 0;
 }
 
 .brand-logo {
@@ -166,6 +173,7 @@ a {
   display: flex;
   align-items: center;
   gap: 1.35rem;
+  padding: 0.55rem 0.35rem;
 }
 
 .site-nav__link,
@@ -343,10 +351,10 @@ a {
   margin-bottom: 1.5rem;
   padding: 0.65rem 1.15rem;
   border-radius: var(--radius-pill);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  background: linear-gradient(135deg, rgba(255, 246, 252, 0.98), rgba(255, 224, 244, 0.96));
-  color: #6f22e8;
-  box-shadow: 0 12px 28px rgba(116, 44, 227, 0.13);
+  border: 1px solid rgba(145, 69, 247, 0.12);
+  background: #fff0fb;
+  color: #6d28e8;
+  box-shadow: 0 10px 22px rgba(116, 44, 227, 0.1);
   font-size: 0.96rem;
   font-weight: 900;
 }
@@ -895,6 +903,7 @@ input:focus-visible {
   .site-nav {
     width: min(calc(100% - 1.25rem), var(--max-width));
     min-height: 4.75rem;
+    padding: 0.2rem 0;
   }
 
   .brand-logo__mark {
