@@ -107,9 +107,23 @@ a {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid var(--line-soft);
+  background: #fff;
+  border-bottom: 0;
   backdrop-filter: blur(18px);
+}
+
+.site-header::after {
+  position: absolute;
+  right: 0;
+  bottom: -3.05rem;
+  left: 0;
+  height: 3.1rem;
+  background-image: url("../assets/cloud.svg");
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: max(48rem, 100%) 3.1rem;
+  content: "";
+  pointer-events: none;
 }
 
 .site-nav {
@@ -297,7 +311,7 @@ a {
   display: grid;
   justify-items: center;
   min-height: calc(100vh - 5.75rem);
-  padding: 6.5rem 1rem 5rem;
+  padding: 8.25rem 1rem 5rem;
   text-align: center;
   overflow: hidden;
 }
@@ -309,7 +323,6 @@ a {
     linear-gradient(180deg, var(--bg-lavender) 0%, #f8f1ff 74%, #fff 100%);
 }
 
-.home-placeholder::before,
 .site-footer__scallop::before {
   position: absolute;
   right: -2rem;
@@ -320,10 +333,6 @@ a {
   content: "";
 }
 
-.home-placeholder::before {
-  top: 0;
-}
-
 .home-placeholder__pill,
 .route-placeholder__eyebrow,
 .not-found__badge {
@@ -332,12 +341,14 @@ a {
   gap: 0.45rem;
   width: max-content;
   margin-bottom: 1.5rem;
-  padding: 0.55rem 1rem;
+  padding: 0.65rem 1.15rem;
   border-radius: var(--radius-pill);
-  background: rgba(255, 230, 244, 0.9);
-  color: var(--purple-deep);
-  font-size: 0.9rem;
-  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, rgba(255, 246, 252, 0.98), rgba(255, 224, 244, 0.96));
+  color: #6f22e8;
+  box-shadow: 0 12px 28px rgba(116, 44, 227, 0.13);
+  font-size: 0.96rem;
+  font-weight: 900;
 }
 
 .home-placeholder__pill svg,
@@ -899,7 +910,7 @@ input:focus-visible {
   .route-placeholder,
   .not-found {
     min-height: calc(100vh - 4.75rem);
-    padding: 4.5rem 1rem 4rem;
+    padding: 6rem 1rem 4rem;
   }
 
   .home-placeholder h1,
