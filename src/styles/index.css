@@ -117,16 +117,15 @@ a {
 .site-header::after {
   position: absolute;
   bottom: -2.25rem;
-  left: 50%;
-  width: 100vw;
+  right: calc((100% - 100vw) / 2);
+  left: calc((100% - 100vw) / 2);
   height: 3.2rem;
   background-image: url("../assets/cloud.svg");
   background-repeat: repeat-x;
-  background-position: center -0.125rem;
+  background-position: center 0;
   background-size: 48rem 3.2rem;
   content: "";
   pointer-events: none;
-  transform: translateX(-50%);
   z-index: 0;
 }
 
@@ -930,7 +929,7 @@ input:focus-visible {
 
   .home-placeholder__doodle {
     top: 7.5rem;
-    right: -1.25rem;
+    right: 0.5rem;
     width: 5.5rem;
     opacity: 0.26;
   }
