@@ -1,0 +1,402 @@
+import { useMemo } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  ChartNoAxesCombined,
+  Heart,
+  Leaf,
+  Rocket,
+  Search,
+  Sparkles,
+  UsersRound,
+  WalletCards,
+} from 'lucide-react'
+import { useAuth } from '../auth/useAuth.js'
+import artistCreator from '../assets/artist-creator.png'
+import blobBlue from '../assets/blob-blue.svg'
+import childRoboticsLearner from '../assets/child-robotics-learner.png'
+import communityGardenTeam from '../assets/community-garden-team.png'
+import doodleLoop from '../assets/doodle-loop.svg'
+import doodlePaperPlane from '../assets/doodle-paper-plane.svg'
+import doodlePurpleBurst from '../assets/doodle-purple-burst.svg'
+import ecoTinyHome from '../assets/eco-tiny-home.png'
+import educationLaptopKids from '../assets/education-laptop-kids.png'
+import mobileClinicSupport from '../assets/mobile-clinic-support.png'
+import robotPrototype from '../assets/robot-prototype.png'
+import EmptyState from '../components/ui/EmptyState.jsx'
+import LoadingState from '../components/ui/LoadingState.jsx'
+import { getPublicCampaign, getPublicCampaigns } from '../services/campaignService.js'
+
+const categories = ['All', 'Technology', 'Arts & Culture', 'Education', 'Health', 'Community', 'Environment']
+const fallbackImages = [
+  robotPrototype,
+  ecoTinyHome,
+  artistCreator,
+  mobileClinicSupport,
+  communityGardenTeam,
+  educationLaptopKids,
+]
+
+const formatCredits = (value) => new Intl.NumberFormat('en-US').format(value ?? 0)
+
+const formatDate = (value) =>
+  value
+    ? new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }).format(new Date(value))
+    : 'Flexible'
+
+const getProgress = (campaign) => {
+  if (!campaign?.fundingGoal) return 0
+
+  return Math.min(100, Math.round(((campaign.amountRaised ?? 0) / campaign.fundingGoal) * 100))
+}
+
+const getCampaignImage = (campaign, index = 0) => campaign?.coverImageUrl || fallbackImages[index % fallbackImages.length]
+
+const readFilters = (searchParams) => ({
+  page: Number(searchParams.get('page') || 1),
+  limit: 9,
+  search: searchParams.get('search') || '',
+  category: searchParams.get('category') || '',
+  deadlineFrom: searchParams.get('deadlineFrom') || '',
+  deadlineTo: searchParams.get('deadlineTo') || '',
+  goalMin: searchParams.get('goalMin') || '',
+  goalMax: searchParams.get('goalMax') || '',
+})
+
+function CampaignCard({ campaign, index }) {
+  const progress = getProgress(campaign)
+
+  return (
+    <article className="explore-card">
+      <div className="explore-card__media">
+        <img alt="" src={getCampaignImage(campaign, index)} />
+        <span>{campaign.category || 'Campaign'}</span>
+      </div>
+      <div className="explore-card__body">
+        <h2>{campaign.title}</h2>
+        <p>Created by {campaign.creatorName || 'FundBloom creator'}</p>
+        <dl className="explore-card__stats">
+          <div>
+            <dt>Deadline</dt>
+            <dd>{formatDate(campaign.deadline)}</dd>
+          </div>
+          <div>
+            <dt>Goal</dt>
+            <dd>{formatCredits(campaign.fundingGoal)}</dd>
+          </div>
+          <div>
+            <dt>Raised</dt>
+            <dd>{formatCredits(campaign.amountRaised)}</dd>
+          </div>
+        </dl>
+        <div className="explore-card__progress" aria-label={`${progress}% funded`}>
+          <span style={{ width: `${progress}%` }} />
+        </div>
+        <Link className="button button--primary" to={`/campaigns/${campaign.id}`}>
+          View Details
+          <ArrowRight aria-hidden="true" className="button__icon" />
+        </Link>
+      </div>
+    </article>
+  )
+}
+
+function ExploreFilters({ filters, setSearchParams }) {
+  const applyFilters = (event) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const next = new URLSearchParams()
+
+    ;['search', 'category', 'deadlineFrom', 'deadlineTo', 'goalMin', 'goalMax'].forEach((key) => {
+      const value = formData.get(key)?.toString().trim()
+
+      if (value && value !== 'All') {
+        next.set(key, value)
+      }
+    })
+
+    setSearchParams(next)
+  }
+
+  const clearFilters = () => setSearchParams(new URLSearchParams())
+
+  return (
+    <form className="explore-filters" onSubmit={applyFilters}>
+      <label>
+        <span>Search campaigns</span>
+        <input defaultValue={filters.search} name="search" placeholder="Robotics, gardens, health..." />
+      </label>
+      <label>
+        <span>Category</span>
+        <select defaultValue={filters.category || 'All'} name="category">
+          {categories.map((category) => (
+            <option key={category}>{category}</option>
+          ))}
+        </select>
+      </label>
+      <label>
+        <span>From deadline</span>
+        <input defaultValue={filters.deadlineFrom} name="deadlineFrom" type="date" />
+      </label>
+      <label>
+        <span>Goal from</span>
+        <input defaultValue={filters.goalMin} min="0" name="goalMin" placeholder="1000" type="number" />
+      </label>
+      <div className="explore-filters__actions">
+        <button className="button button--primary" type="submit">
+          <Search aria-hidden="true" className="button__icon" />
+          Search
+        </button>
+        <button className="button button--ghost" onClick={clearFilters} type="button">
+          Reset
+        </button>
+      </div>
+    </form>
+  )
+}
+
+function ExplorePage({ surface = 'public' }) {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const filters = useMemo(() => readFilters(searchParams), [searchParams])
+  const query = useQuery({
+    queryKey: ['public-campaigns', filters],
+    queryFn: () => getPublicCampaigns(filters),
+    staleTime: 60_000,
+  })
+  const campaigns = query.data?.campaigns ?? []
+  const meta = query.data?.meta
+  const isDashboard = surface === 'dashboard'
+
+  const movePage = (page) => {
+    const next = new URLSearchParams(searchParams)
+    next.set('page', String(page))
+    setSearchParams(next)
+  }
+
+  return (
+    <section className={`explore-page${isDashboard ? ' explore-page--dashboard' : ''}`} aria-labelledby="explore-title">
+      <div className="explore-hero">
+        <img alt="" className="explore-doodle explore-doodle--loop" src={doodleLoop} />
+        <img alt="" className="explore-doodle explore-doodle--burst" src={doodlePurpleBurst} />
+        <div>
+          <p className="home-pill">
+            <Heart aria-hidden="true" />
+            Approved ideas. Real progress.
+          </p>
+          <h1 id="explore-title">Explore campaigns ready for support</h1>
+          <p>
+            Browse vetted FundBloom campaigns with active deadlines, clear goals, and creators ready to turn support
+            into visible impact.
+          </p>
+        </div>
+        <div className="explore-hero__media" aria-hidden="true">
+          <img alt="" src={childRoboticsLearner} />
+          <img alt="" src={blobBlue} />
+        </div>
+      </div>
+
+      <ExploreFilters filters={filters} setSearchParams={setSearchParams} />
+
+      {query.isLoading ? (
+        <LoadingState title="Loading campaigns" description="Finding approved projects with active deadlines." />
+      ) : query.isError ? (
+        <EmptyState
+          action={
+            <button className="button button--primary" onClick={() => query.refetch()} type="button">
+              Try again
+            </button>
+          }
+          description="The campaign list could not be loaded right now."
+          title="Campaigns need a refresh"
+        />
+      ) : campaigns.length === 0 ? (
+        <EmptyState
+          action={
+            <button className="button button--primary" onClick={() => setSearchParams(new URLSearchParams())} type="button">
+              Clear filters
+            </button>
+          }
+          description="Try a different category, search term, or goal range."
+          title="No campaigns match this view"
+        />
+      ) : (
+        <>
+          <div className="explore-grid">
+            {campaigns.map((campaign, index) => (
+              <CampaignCard campaign={campaign} index={index} key={campaign.id} />
+            ))}
+          </div>
+          <div className="explore-pagination" aria-label="Campaign pagination">
+            <button
+              className="button button--secondary"
+              disabled={!meta?.hasPrev}
+              onClick={() => movePage((meta?.page ?? 1) - 1)}
+              type="button"
+            >
+              Previous
+            </button>
+            <span>
+              Page {meta?.page ?? 1} of {Math.max(meta?.totalPages ?? 1, 1)}
+            </span>
+            <button
+              className="button button--secondary"
+              disabled={!meta?.hasNext}
+              onClick={() => movePage((meta?.page ?? 1) + 1)}
+              type="button"
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
+    </section>
+  )
+}
+
+export function CampaignDetailPage() {
+  const { campaignId } = useParams()
+  const { isAuthenticated, user } = useAuth()
+  const query = useQuery({
+    queryKey: ['public-campaign', campaignId],
+    queryFn: () => getPublicCampaign(campaignId),
+    staleTime: 60_000,
+  })
+  const campaign = query.data
+  const progress = getProgress(campaign)
+  const canContribute = isAuthenticated && user?.role === 'supporter'
+
+  if (query.isLoading) {
+    return (
+      <section className="campaign-detail-page">
+        <LoadingState title="Loading campaign" description="Opening the latest approved campaign details." />
+      </section>
+    )
+  }
+
+  if (query.isError) {
+    return (
+      <section className="campaign-detail-page">
+        <EmptyState
+          action={
+            <Link className="button button--primary" to="/explore">
+              Back to Explore
+            </Link>
+          }
+          description="This campaign may no longer be active or approved."
+          title="Campaign not available"
+        />
+      </section>
+    )
+  }
+
+  return (
+    <section className="campaign-detail-page" aria-labelledby="campaign-detail-title">
+      <Link className="campaign-detail-back" to="/explore">
+        <ArrowLeft aria-hidden="true" />
+        Back to Explore
+      </Link>
+      <div className="campaign-detail-hero">
+        <div>
+          <p className="home-pill">
+            <Sparkles aria-hidden="true" />
+            {campaign.category || 'Approved campaign'}
+          </p>
+          <h1 id="campaign-detail-title">{campaign.title}</h1>
+          <p>{campaign.story}</p>
+          <dl className="campaign-detail-stats">
+            <div>
+              <ChartNoAxesCombined aria-hidden="true" />
+              <span>
+                <dt>Raised</dt>
+                <dd>{formatCredits(campaign.amountRaised)} credits</dd>
+              </span>
+            </div>
+            <div>
+              <WalletCards aria-hidden="true" />
+              <span>
+                <dt>Funding goal</dt>
+                <dd>{formatCredits(campaign.fundingGoal)} credits</dd>
+              </span>
+            </div>
+            <div>
+              <CalendarDays aria-hidden="true" />
+              <span>
+                <dt>Deadline</dt>
+                <dd>{formatDate(campaign.deadline)}</dd>
+              </span>
+            </div>
+            <div>
+              <UsersRound aria-hidden="true" />
+              <span>
+                <dt>Creator</dt>
+                <dd>{campaign.creatorName}</dd>
+              </span>
+            </div>
+          </dl>
+        </div>
+        <div className="campaign-detail-media">
+          <img alt="" src={getCampaignImage(campaign)} />
+          <img alt="" className="campaign-detail-media__doodle" src={doodlePaperPlane} />
+        </div>
+      </div>
+
+      <div className="campaign-detail-body">
+        <article className="campaign-story-panel">
+          <p className="home-pill home-pill--flat">
+            <Leaf aria-hidden="true" />
+            Campaign progress
+          </p>
+          <h2>Every credit moves this idea forward</h2>
+          <div className="explore-card__progress" aria-label={`${progress}% funded`}>
+            <span style={{ width: `${progress}%` }} />
+          </div>
+          <p>
+            {progress}% funded toward a {formatCredits(campaign.fundingGoal)} credit goal. Minimum support starts at{' '}
+            {formatCredits(campaign.minimumContribution)} credits.
+          </p>
+          <h3>Reward for supporters</h3>
+          <p>{campaign.rewardInfo}</p>
+        </article>
+
+        <aside className="contribution-panel" aria-labelledby="contribution-title">
+          <p className="home-pill home-pill--flat">
+            <Rocket aria-hidden="true" />
+            Support this project
+          </p>
+          <h2 id="contribution-title">Contribution amount</h2>
+          {canContribute ? (
+            <form>
+              <label>
+                <span>Credits to contribute</span>
+                <input min={campaign.minimumContribution ?? 1} placeholder={campaign.minimumContribution} type="number" />
+              </label>
+              <button className="button button--primary" disabled type="button">
+                Contribution opens next
+              </button>
+              <p>The server contribution flow is the next vertical task, so this form is staged for that endpoint.</p>
+            </form>
+          ) : (
+            <div className="contribution-panel__locked">
+              <p>Sign in as a Supporter to contribute credits when contributions open.</p>
+              <Link className="button button--primary" to="/login">
+                Login as Supporter
+              </Link>
+              <Link className="button button--secondary" to="/register">
+                Create Supporter Account
+              </Link>
+            </div>
+          )}
+        </aside>
+      </div>
+    </section>
+  )
+}
+
+export default ExplorePage

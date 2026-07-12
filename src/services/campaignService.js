@@ -29,6 +29,39 @@ export const deleteCampaign = async (campaignId) => {
   return response.data.data
 }
 
+export const getPublicCampaigns = async ({
+  page = 1,
+  limit = 9,
+  search = '',
+  category = '',
+  deadlineFrom = '',
+  deadlineTo = '',
+  goalMin = '',
+  goalMax = '',
+} = {}) => {
+  const params = { page, limit }
+
+  if (search) params.search = search
+  if (category) params.category = category
+  if (deadlineFrom) params.deadlineFrom = deadlineFrom
+  if (deadlineTo) params.deadlineTo = deadlineTo
+  if (goalMin) params.goalMin = goalMin
+  if (goalMax) params.goalMax = goalMax
+
+  const response = await apiClient.get('/campaigns', { params })
+
+  return {
+    campaigns: response.data.data.campaigns,
+    meta: response.data.meta,
+  }
+}
+
+export const getPublicCampaign = async (campaignId) => {
+  const response = await apiClient.get(`/campaigns/${campaignId}`)
+
+  return response.data.data.campaign
+}
+
 export const getAdminCampaigns = async ({ status = 'pending', search = '', page = 1, limit = 10 } = {}) => {
   const response = await apiClient.get('/admin/campaigns', {
     params: { status, search, page, limit },

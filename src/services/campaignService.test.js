@@ -5,6 +5,8 @@ import {
   decideAdminCampaign,
   deleteAdminCampaign,
   deleteCampaign,
+  getPublicCampaign,
+  getPublicCampaigns,
   getAdminCampaigns,
   getCreatorCampaigns,
   suspendAdminCampaign,
@@ -72,6 +74,54 @@ describe('campaign service', () => {
     })
     expect(apiClient.patch).toHaveBeenCalledWith('/campaigns/campaign_1', { title: 'Updated' })
     expect(apiClient.delete).toHaveBeenCalledWith('/campaigns/campaign_1')
+  })
+
+  it('loads public campaigns and detail records from the approved discovery endpoints', async () => {
+    apiClient.get
+      .mockResolvedValueOnce({
+        data: {
+          data: { campaigns: [{ id: 'campaign_1', title: 'Robotics Lab' }] },
+          meta: { page: 2, totalItems: 13 },
+        },
+      })
+      .mockResolvedValueOnce({
+        data: { data: { campaign: { id: 'campaign_1', title: 'Robotics Lab', story: 'Full story' } } },
+      })
+
+    await expect(
+      getPublicCampaigns({
+        page: 2,
+        limit: 9,
+        search: 'robot',
+        category: 'Education',
+        deadlineFrom: '2027-01-01',
+        deadlineTo: '2027-12-31',
+        goalMin: '1000',
+        goalMax: '20000',
+      }),
+    ).resolves.toEqual({
+      campaigns: [{ id: 'campaign_1', title: 'Robotics Lab' }],
+      meta: { page: 2, totalItems: 13 },
+    })
+    await expect(getPublicCampaign('campaign_1')).resolves.toEqual({
+      id: 'campaign_1',
+      title: 'Robotics Lab',
+      story: 'Full story',
+    })
+
+    expect(apiClient.get).toHaveBeenNthCalledWith(1, '/campaigns', {
+      params: {
+        page: 2,
+        limit: 9,
+        search: 'robot',
+        category: 'Education',
+        deadlineFrom: '2027-01-01',
+        deadlineTo: '2027-12-31',
+        goalMin: '1000',
+        goalMax: '20000',
+      },
+    })
+    expect(apiClient.get).toHaveBeenNthCalledWith(2, '/campaigns/campaign_1')
   })
 
   it('loads and mutates admin campaign records', async () => {

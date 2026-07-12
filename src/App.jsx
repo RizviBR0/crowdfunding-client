@@ -6,6 +6,7 @@ import AuthPage from './pages/AuthPage.jsx'
 import { DashboardHomePage, DashboardPlaceholderPage } from './pages/DashboardPage.jsx'
 import AdminCampaignPage from './pages/AdminCampaignPage.jsx'
 import CreatorCampaignPage from './pages/CreatorCampaignPage.jsx'
+import ExplorePage, { CampaignDetailPage } from './pages/ExplorePage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
@@ -15,7 +16,8 @@ function App() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<HomePage />} />
-        <Route element={<PlaceholderPage type="explore" />} path="explore" />
+        <Route element={<ExplorePage />} path="explore" />
+        <Route element={<CampaignDetailPage />} path="campaigns/:campaignId" />
         <Route element={<PlaceholderPage type="howItWorks" />} path="how-it-works" />
         <Route element={<PlaceholderPage type="stories" />} path="stories" />
         <Route element={<GuestRoute />}>
@@ -30,7 +32,7 @@ function App() {
           <Route index element={<DashboardRoleRedirect />} />
           <Route element={<RoleRoute allowedRole="supporter" />}>
             <Route element={<DashboardHomePage role="supporter" />} path="supporter" />
-            <Route element={<DashboardPlaceholderPage type="supporterExplore" />} path="supporter/explore" />
+            <Route element={<ExplorePage surface="dashboard" />} path="supporter/explore" />
             <Route
               element={<DashboardPlaceholderPage type="supporterContributions" />}
               path="supporter/contributions"
