@@ -1,17 +1,22 @@
+import { Route, Routes } from 'react-router-dom'
+import PublicLayout from './layouts/PublicLayout.jsx'
+import HomePage from './pages/HomePage.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
+import PlaceholderPage from './pages/PlaceholderPage.jsx'
+
 function App() {
   return (
-    <main className="app-shell" aria-labelledby="app-title">
-      <section className="startup-screen">
-        <div className="startup-screen__content">
-          <p className="startup-screen__eyebrow">Crowdfunding platform</p>
-          <h1 id="app-title">FundBloom</h1>
-          <p>
-            Public navigation, the assignment landing page, authentication, and dashboard routes will be added through
-            their dedicated tasks.
-          </p>
-        </div>
-      </section>
-    </main>
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route index element={<HomePage />} />
+        <Route element={<PlaceholderPage type="explore" />} path="explore" />
+        <Route element={<PlaceholderPage type="howItWorks" />} path="how-it-works" />
+        <Route element={<PlaceholderPage type="stories" />} path="stories" />
+        <Route element={<PlaceholderPage type="login" />} path="login" />
+        <Route element={<PlaceholderPage type="register" />} path="register" />
+        <Route element={<NotFoundPage />} path="*" />
+      </Route>
+    </Routes>
   )
 }
 
