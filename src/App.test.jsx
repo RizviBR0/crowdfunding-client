@@ -11,7 +11,7 @@ describe('client application shell', () => {
       </AppProviders>,
     )
 
-    expect(screen.getByRole('heading', { name: 'LanternRaise' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'FundBloom' })).toBeInTheDocument()
     expect(screen.getByText(/crowdfunding platform/i)).toBeInTheDocument()
     expect(screen.queryByText(/design foundation/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/inspect primitives/i)).not.toBeInTheDocument()

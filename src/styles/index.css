@@ -1,7 +1,7 @@
 :root {
   color-scheme: light;
-  --font-sans: "Sora", "Segoe UI", sans-serif;
-  --font-serif: "Newsreader", Georgia, serif;
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+  --font-display: "Boldonse", "Inter", sans-serif;
   --bg-base: #f7f2ea;
   --bg-panel: #fffaf2;
   --bg-muted: #eef3f0;
@@ -111,9 +111,9 @@ a {
 .state-block h3,
 .modal-panel h3 {
   margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 600;
-  line-height: 1.05;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 .startup-screen h1 {
