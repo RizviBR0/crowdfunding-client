@@ -27,6 +27,11 @@ const placeholderCopy = {
     title: 'Join as a supporter or creator',
     description: 'Start backing meaningful campaigns or launch an idea that deserves a community behind it.',
   },
+  dashboard: {
+    eyebrow: 'Dashboard',
+    title: 'Your dashboard is getting ready',
+    description: 'Authentication is connected. Role-specific dashboard sections arrive in the next implementation step.',
+  },
 }
 
 function PlaceholderPage({ type }) {
