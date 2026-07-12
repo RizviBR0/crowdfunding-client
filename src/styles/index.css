@@ -116,14 +116,14 @@ a {
 
 .site-header::after {
   position: absolute;
-  bottom: -3rem;
+  bottom: -2.25rem;
   left: 50%;
   width: 100vw;
-  height: 3.1rem;
+  height: 3.2rem;
   background-image: url("../assets/cloud.svg");
   background-repeat: repeat-x;
-  background-position: top center;
-  background-size: 48rem 3.1rem;
+  background-position: center -0.62rem;
+  background-size: 48rem 3.2rem;
   content: "";
   pointer-events: none;
   transform: translateX(-50%);
@@ -319,7 +319,7 @@ a {
   display: grid;
   justify-items: center;
   min-height: calc(100vh - 5.75rem);
-  padding: 8.25rem 1rem 5rem;
+  padding: 7.55rem 1rem 5rem;
   text-align: center;
   overflow: hidden;
 }
@@ -919,7 +919,7 @@ input:focus-visible {
   .route-placeholder,
   .not-found {
     min-height: calc(100vh - 4.75rem);
-    padding: 6rem 1rem 4rem;
+    padding: 5.35rem 1rem 4rem;
   }
 
   .home-placeholder h1,
