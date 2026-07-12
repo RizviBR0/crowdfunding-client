@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
 
+const titleId = 'modal-title'
+const descriptionId = 'modal-description'
+
 function Modal({ children, description, isOpen, onClose, title }) {
   useEffect(() => {
     if (!isOpen) {
@@ -30,8 +33,8 @@ function Modal({ children, description, isOpen, onClose, title }) {
       onClick={onClose}
     >
       <div
-        aria-describedby="design-modal-description"
-        aria-labelledby="design-modal-title"
+        aria-describedby={description ? descriptionId : undefined}
+        aria-labelledby={titleId}
         aria-modal="true"
         className="modal-panel"
         onClick={(event) => event.stopPropagation()}
@@ -39,11 +42,10 @@ function Modal({ children, description, isOpen, onClose, title }) {
       >
         <div className="modal-panel__header">
           <div>
-            <p className="modal-panel__eyebrow">Modal shell preview</p>
-            <h3 id="design-modal-title">{title}</h3>
-            <p id="design-modal-description">{description}</p>
+            <h3 id={titleId}>{title}</h3>
+            {description ? <p id={descriptionId}>{description}</p> : null}
           </div>
-          <button aria-label="Close preview modal" className="icon-button" onClick={onClose} type="button">
+          <button aria-label="Close dialog" className="icon-button" onClick={onClose} type="button">
             <X aria-hidden="true" />
           </button>
         </div>
