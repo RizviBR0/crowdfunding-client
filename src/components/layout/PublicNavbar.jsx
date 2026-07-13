@@ -38,7 +38,14 @@ function PublicNavbar({ viewer = null, onLogout }) {
 
         <div className="site-nav__actions">
           {isLoggedIn ? (
-            <div className="site-nav__user-menu" ref={profileMenuRef}>
+            <>
+              {viewer?.role === 'supporter' && (
+                <Link className="dashboard-credit" to="/dashboard/supporter/credits" style={{ textDecoration: 'none' }}>
+                  <WalletCards aria-hidden="true" size={16} />
+                  <span>{viewer.credits ?? 0} credits</span>
+                </Link>
+              )}
+              <div className="site-nav__user-menu" ref={profileMenuRef}>
               <button
                 className="site-nav__user-menu-trigger"
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
@@ -54,9 +61,15 @@ function PublicNavbar({ viewer = null, onLogout }) {
                     <span className="user-dropdown__name">{viewer.displayName || 'User'}</span>
                   </div>
                   <Link className="user-dropdown__item" to="/dashboard" onClick={() => setIsProfileMenuOpen(false)}>
-                    <WalletCards aria-hidden="true" size={16} />
-                    <span>{viewer.credits ?? 0} credits</span>
+                    <LayoutDashboard aria-hidden="true" size={16} />
+                    <span>Dashboard</span>
                   </Link>
+                  {viewer?.role === 'supporter' && (
+                    <Link className="user-dropdown__item" to="/dashboard/supporter/credits" onClick={() => setIsProfileMenuOpen(false)}>
+                      <WalletCards aria-hidden="true" size={16} />
+                      <span>{viewer.credits ?? 0} credits</span>
+                    </Link>
+                  )}
                   <button className="user-dropdown__item user-dropdown__logout" onClick={onLogout}>
                     <LogOut aria-hidden="true" size={16} />
                     <span>Logout</span>
@@ -64,6 +77,7 @@ function PublicNavbar({ viewer = null, onLogout }) {
                 </div>
               )}
             </div>
+            </>
           ) : (
             <>
               <Link className="site-nav__auth" to="/login">
@@ -105,7 +119,12 @@ function PublicNavbar({ viewer = null, onLogout }) {
                 <LayoutDashboard aria-hidden="true" />
                 Dashboard
               </Link>
-              <span className="mobile-menu__meta">{viewer.credits ?? 0} available credits</span>
+              {viewer?.role === 'supporter' && (
+                <Link className="mobile-menu__link" onClick={closeMenu} to="/dashboard/supporter/credits">
+                  <WalletCards aria-hidden="true" />
+                  {viewer.credits ?? 0} available credits
+                </Link>
+              )}
               <Button icon={LogOut} onClick={onLogout} variant="ghost">
                 Logout
               </Button>

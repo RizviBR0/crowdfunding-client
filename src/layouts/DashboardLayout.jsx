@@ -49,10 +49,12 @@ function DashboardLayout() {
           <BrandLogo />
 
           <div className="dashboard-header__meta">
-            <span className="dashboard-credit">
-              <WalletCards aria-hidden="true" />
-              {user?.credits ?? 0} credits
-            </span>
+            {user?.role === 'supporter' && (
+              <Link className="dashboard-credit" to="/dashboard/supporter/credits" style={{ textDecoration: 'none' }}>
+                <WalletCards aria-hidden="true" />
+                {user.credits ?? 0} credits
+              </Link>
+            )}
             <div className="dashboard-notification-wrap" ref={notificationRef}>
             <button aria-expanded={isNotificationsOpen} aria-label="Open notifications" className="dashboard-notification" onClick={() => setIsNotificationsOpen((current) => !current)} type="button">
               <Bell aria-hidden="true" />

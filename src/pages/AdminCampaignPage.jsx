@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2, RefreshCw, Search, ShieldAlert, Trash2, XCircle } from 'lucide-react'
 import Button from '../components/ui/Button.jsx'
-import DataTable from '../components/ui/DataTable.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
 import LoadingState from '../components/ui/LoadingState.jsx'
 import Modal from '../components/ui/Modal.jsx'
@@ -117,7 +116,7 @@ function AdminCampaignActionDialog({ action, campaign, isOpen, onClose }) {
         return
       }
 
-      setMessage(`Campaign ${result.campaign.status}.`)
+      onClose()
     },
     onError: (error) => setMessage(getApiErrorMessage(error)),
   })
@@ -182,67 +181,7 @@ function AdminCampaignPage() {
   const campaigns = campaignsQuery.data?.campaigns ?? []
   const pendingCount = campaigns.filter((campaign) => campaign.status === 'pending').length
 
-  const columns = useMemo(
-    () => [
-      {
-        key: 'title',
-        label: 'Campaign',
-        render: (campaign) => (
-          <span className="campaign-title-cell">
-            <strong>{campaign.title}</strong>
-            <small>{campaign.category}</small>
-          </span>
-        ),
-      },
-      {
-        key: 'creatorName',
-        label: 'Creator',
-        render: (campaign) => (
-          <span className="campaign-title-cell campaign-title-cell--compact">
-            <strong>{campaign.creatorName}</strong>
-            <small>{campaign.creatorEmail}</small>
-          </span>
-        ),
-      },
-      { key: 'deadline', label: 'Deadline', render: (campaign) => formatDate(campaign.deadline) },
-      { key: 'fundingGoal', label: 'Goal', render: (campaign) => formatCredits(campaign.fundingGoal), align: 'right' },
-      { key: 'amountRaised', label: 'Raised', render: (campaign) => formatCredits(campaign.amountRaised), align: 'right' },
-      {
-        key: 'status',
-        label: 'Status',
-        render: (campaign) => <span className={`status-chip status-chip--${campaign.status}`}>{campaign.status}</span>,
-      },
-      {
-        key: 'actions',
-        label: 'Actions',
-        render: (campaign) => (
-          <span className="campaign-row-actions admin-campaign-actions">
-            {campaign.status === 'pending' ? (
-              <>
-                <button aria-label={`Approve ${campaign.title}`} onClick={() => setDialogState({ action: 'approve', campaign })} type="button">
-                  <CheckCircle2 aria-hidden="true" />
-                </button>
-                <button aria-label={`Reject ${campaign.title}`} onClick={() => setDialogState({ action: 'reject', campaign })} type="button">
-                  <XCircle aria-hidden="true" />
-                </button>
-              </>
-            ) : null}
-            {campaign.status !== 'deleted' && campaign.status !== 'suspended' ? (
-              <button aria-label={`Suspend ${campaign.title}`} onClick={() => setDialogState({ action: 'suspend', campaign })} type="button">
-                <ShieldAlert aria-hidden="true" />
-              </button>
-            ) : null}
-            {campaign.status !== 'deleted' ? (
-              <button aria-label={`Delete ${campaign.title}`} onClick={() => setDialogState({ action: 'delete', campaign })} type="button">
-                <Trash2 aria-hidden="true" />
-              </button>
-            ) : null}
-          </span>
-        ),
-      },
-    ],
-    [],
-  )
+
 
   return (
     <section className="dashboard-page campaign-workspace admin-campaign-workspace" aria-labelledby="admin-campaigns-title">
@@ -313,7 +252,76 @@ function AdminCampaignPage() {
         />
       ) : null}
       {campaigns.length > 0 ? (
-        <DataTable caption="Admin campaign management table" columns={columns} rows={campaigns} />
+        <div className="table-shell campaign-table-shell">
+          <table className="data-table responsive-table campaign-table">
+            <caption className="sr-only">Admin campaign management table</caption>
+            <thead>
+              <tr>
+                <th scope="col">Campaign</th>
+                <th scope="col">Creator</th>
+                <th scope="col">Deadline</th>
+                <th scope="col" className="data-table__cell--right">Goal</th>
+                <th scope="col" className="data-table__cell--right">Raised</th>
+                <th scope="col">Status</th>
+                <th scope="col" className="data-table__cell--right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {campaigns.map((campaign) => (
+                <tr key={campaign.id} className="campaign-table-row">
+                  <td className="campaign-title-col" data-label="Campaign">
+                    <span className="campaign-title-cell">
+                      <strong>{campaign.title}</strong>
+                      <small>{campaign.category}</small>
+                    </span>
+                  </td>
+                  <td className="campaign-creator-col" data-label="Creator">
+                    <span className="campaign-title-cell campaign-title-cell--compact">
+                      <strong>{campaign.creatorName}</strong>
+                      <small>{campaign.creatorEmail}</small>
+                    </span>
+                  </td>
+                  <td className="campaign-deadline-col" data-label="Deadline">
+                    {formatDate(campaign.deadline)}
+                  </td>
+                  <td className="campaign-goal-col data-table__cell--right" data-label="Goal">
+                    {formatCredits(campaign.fundingGoal)}
+                  </td>
+                  <td className="campaign-raised-col data-table__cell--right" data-label="Raised">
+                    {formatCredits(campaign.amountRaised)}
+                  </td>
+                  <td className="campaign-status-col" data-label="Status">
+                    <span className={`status-chip status-chip--${campaign.status}`}>{campaign.status}</span>
+                  </td>
+                  <td className="campaign-actions-col data-table__cell--right" data-label="Actions">
+                    <span className="campaign-row-actions admin-campaign-actions">
+                      {campaign.status === 'pending' ? (
+                        <>
+                          <button aria-label={`Approve ${campaign.title}`} onClick={() => setDialogState({ action: 'approve', campaign })} type="button" className="action-btn action-btn--approve">
+                            <CheckCircle2 aria-hidden="true" />
+                          </button>
+                          <button aria-label={`Reject ${campaign.title}`} onClick={() => setDialogState({ action: 'reject', campaign })} type="button" className="action-btn action-btn--reject">
+                            <XCircle aria-hidden="true" />
+                          </button>
+                        </>
+                      ) : null}
+                      {campaign.status !== 'deleted' && campaign.status !== 'suspended' ? (
+                        <button aria-label={`Suspend ${campaign.title}`} onClick={() => setDialogState({ action: 'suspend', campaign })} type="button" className="action-btn action-btn--suspend">
+                          <ShieldAlert aria-hidden="true" />
+                        </button>
+                      ) : null}
+                      {campaign.status !== 'deleted' ? (
+                        <button aria-label={`Delete ${campaign.title}`} onClick={() => setDialogState({ action: 'delete', campaign })} type="button" className="action-btn action-btn--delete">
+                          <Trash2 aria-hidden="true" />
+                        </button>
+                      ) : null}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : null}
 
       {dialogState ? (

@@ -17,17 +17,17 @@ export const removeAdminUser = async (userId) => {
 
 export const getAdminWithdrawals = async ({ page = 1, limit = 10, status = 'pending' } = {}) => {
   const response = await apiClient.get('/admin/withdrawals', { params: { page, limit, status } })
-  return { withdrawals: response.data.data.withdrawals, meta: response.data.meta }
+  return { withdrawals: response.data.data, meta: response.data.meta }
 }
 
 export const approveAdminWithdrawal = async ({ withdrawalId, idempotencyKey }) => {
   const response = await apiClient.patch(`/admin/withdrawals/${withdrawalId}/approve`, {}, { headers: { 'Idempotency-Key': idempotencyKey } })
-  return response.data.data.withdrawal
+  return response.data.data
 }
 
 export const rejectAdminWithdrawal = async ({ withdrawalId, idempotencyKey }) => {
   const response = await apiClient.patch(`/admin/withdrawals/${withdrawalId}/reject`, {}, { headers: { 'Idempotency-Key': idempotencyKey } })
-  return response.data.data.withdrawal
+  return response.data.data
 }
 
 export const getAdminReports = async ({ page = 1, limit = 10, status = 'open' } = {}) => {

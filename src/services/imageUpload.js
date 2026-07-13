@@ -13,10 +13,6 @@ export const uploadProfileImage = async (file) => {
     throw new Error('Choose an image file for the profile picture.')
   }
 
-  if (file.size > 2 * 1024 * 1024) {
-    throw new Error('Profile picture must be 2MB or smaller.')
-  }
-
   const formData = new FormData()
   formData.append('image', file)
 

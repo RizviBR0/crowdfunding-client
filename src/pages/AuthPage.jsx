@@ -264,7 +264,7 @@ function AuthPage({ mode }) {
                   <label className="auth-file auth-file--large">
                     <ImagePlus aria-hidden="true" className="auth-file__icon" />
                     <span className="auth-file__text">Click to upload image</span>
-                    <span className="auth-file__subtext">JPG, PNG or GIF — max 2 MB</span>
+                    <span className="auth-file__subtext">JPG, PNG or GIF</span>
                     <input
                       accept="image/*"
                       onChange={(event) => handlePhotoSelect(event.target.files?.[0] || null)}

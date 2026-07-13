@@ -121,6 +121,8 @@ function CreatorCampaignForm() {
   const [form, setForm] = useState(emptyCreateForm)
   const [errors, setErrors] = useState({})
   const [statusMessage, setStatusMessage] = useState('')
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [imageInputMode, setImageInputMode] = useState('upload')
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -147,7 +149,8 @@ function CreatorCampaignForm() {
     },
     onSuccess: async () => {
       setForm(emptyCreateForm)
-      setStatusMessage('Campaign submitted for admin approval.')
+      setIsSuccessModalOpen(true)
+      setStatusMessage('')
       await queryClient.invalidateQueries({ queryKey: ['creator-campaigns'] })
     },
     onError: (error) => {
@@ -184,6 +187,7 @@ function CreatorCampaignForm() {
           <label>
             <span>Campaign title</span>
             <input
+              aria-invalid={errors.title ? 'true' : undefined}
               aria-describedby={errors.title ? 'campaign-title-error' : undefined}
               value={form.title}
               onChange={(event) => updateField('title', event.target.value)}
@@ -194,7 +198,7 @@ function CreatorCampaignForm() {
 
           <label>
             <span>Category</span>
-            <select value={form.category} onChange={(event) => updateField('category', event.target.value)}>
+            <select aria-invalid={errors.category ? 'true' : undefined} value={form.category} onChange={(event) => updateField('category', event.target.value)}>
               {categories.map((category) => (
                 <option key={category} value={category}>
                   {category}
@@ -206,6 +210,7 @@ function CreatorCampaignForm() {
           <label>
             <span>Funding goal</span>
             <input
+              aria-invalid={errors.fundingGoal ? 'true' : undefined}
               aria-describedby={errors.fundingGoal ? 'funding-goal-error' : undefined}
               min="1"
               type="number"
@@ -219,6 +224,7 @@ function CreatorCampaignForm() {
           <label>
             <span>Minimum contribution</span>
             <input
+              aria-invalid={errors.minimumContribution ? 'true' : undefined}
               aria-describedby={errors.minimumContribution ? 'minimum-contribution-error' : undefined}
               min="1"
               type="number"
@@ -232,6 +238,7 @@ function CreatorCampaignForm() {
           <label>
             <span>Deadline</span>
             <input
+              aria-invalid={errors.deadline ? 'true' : undefined}
               aria-describedby={errors.deadline ? 'campaign-deadline-error' : undefined}
               type="date"
               value={form.deadline}
@@ -239,23 +246,12 @@ function CreatorCampaignForm() {
             />
             <ErrorMessage id="campaign-deadline-error">{errors.deadline}</ErrorMessage>
           </label>
-
-          <label>
-            <span>Campaign image URL</span>
-            <input
-              aria-describedby={errors.imageUrl ? 'campaign-image-url-error' : undefined}
-              type="url"
-              value={form.imageUrl}
-              onChange={(event) => updateField('imageUrl', event.target.value)}
-              placeholder="https://example.com/campaign.jpg"
-            />
-            <ErrorMessage id="campaign-image-url-error">{errors.imageUrl}</ErrorMessage>
-          </label>
         </div>
 
         <label>
           <span>Campaign story</span>
           <textarea
+            aria-invalid={errors.story ? 'true' : undefined}
             aria-describedby={errors.story ? 'campaign-story-error' : undefined}
             rows="5"
             value={form.story}
@@ -268,6 +264,7 @@ function CreatorCampaignForm() {
         <label>
           <span>Reward info</span>
           <textarea
+            aria-invalid={errors.rewardInfo ? 'true' : undefined}
             aria-describedby={errors.rewardInfo ? 'campaign-reward-error' : undefined}
             rows="3"
             value={form.rewardInfo}
@@ -277,18 +274,62 @@ function CreatorCampaignForm() {
           <ErrorMessage id="campaign-reward-error">{errors.rewardInfo}</ErrorMessage>
         </label>
 
-        <label className="campaign-upload">
-          <span>
-            <ImageUp aria-hidden="true" />
-            Upload cover image
-          </span>
-          <input
-            accept="image/*"
-            type="file"
-            onChange={(event) => updateField('imageFile', event.target.files?.[0] ?? null)}
-          />
-          {form.imageFile ? <small>{form.imageFile.name}</small> : <small>Optional when an HTTPS URL is provided.</small>}
-        </label>
+        <div className="campaign-image-section">
+          {imageInputMode === 'upload' ? (
+            <label className="campaign-upload" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '0.45rem' }}>
+                <span style={{ fontSize: '0.9rem' }}>
+                  <ImageUp aria-hidden="true" />
+                  Upload cover image
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setImageInputMode('url')
+                    updateField('imageFile', null)
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--purple)', fontWeight: 'bold', fontSize: '0.8rem', cursor: 'pointer', padding: 0 }}
+                >
+                  Paste link instead
+                </button>
+              </div>
+              <input
+                accept="image/*"
+                type="file"
+                onChange={(event) => updateField('imageFile', event.target.files?.[0] ?? null)}
+              />
+              {form.imageFile ? <small>{form.imageFile.name}</small> : null}
+              <ErrorMessage id="campaign-image-file-error">{errors.imageUrl}</ErrorMessage>
+            </label>
+          ) : (
+            <label style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '0.45rem' }}>
+                <span style={{ fontSize: '0.9rem' }}>Campaign image URL</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setImageInputMode('upload')
+                    updateField('imageUrl', '')
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--purple)', fontWeight: 'bold', fontSize: '0.8rem', cursor: 'pointer', padding: 0 }}
+                >
+                  Upload image instead
+                </button>
+              </div>
+              <input
+                aria-invalid={errors.imageUrl ? 'true' : undefined}
+                aria-describedby={errors.imageUrl ? 'campaign-image-url-error' : undefined}
+                type="url"
+                value={form.imageUrl}
+                onChange={(event) => updateField('imageUrl', event.target.value)}
+                placeholder="https://example.com/campaign.jpg"
+              />
+              <ErrorMessage id="campaign-image-url-error">{errors.imageUrl}</ErrorMessage>
+            </label>
+          )}
+        </div>
 
         <div className="campaign-form__actions">
           <Button disabled={mutation.isPending} icon={Plus} type="submit">
@@ -297,6 +338,17 @@ function CreatorCampaignForm() {
           {statusMessage ? <p aria-live="polite">{statusMessage}</p> : null}
         </div>
       </form>
+
+      <Modal
+        description="Your campaign has been successfully submitted and is pending review by an admin."
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        title="Submitted for Review"
+      >
+        <div className="campaign-form__actions" style={{ marginTop: '1rem' }}>
+          <Button onClick={() => setIsSuccessModalOpen(false)}>Close</Button>
+        </div>
+      </Modal>
     </section>
   )
 }
@@ -353,17 +405,17 @@ function UpdateCampaignDialog({ campaign, isOpen, onClose }) {
       >
         <label>
           <span>Campaign title</span>
-          <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} />
+          <input aria-invalid={errors.title ? 'true' : undefined} value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} />
           <ErrorMessage>{errors.title}</ErrorMessage>
         </label>
         <label>
           <span>Campaign story</span>
-          <textarea rows="4" value={form.story} onChange={(event) => setForm((current) => ({ ...current, story: event.target.value }))} />
+          <textarea aria-invalid={errors.story ? 'true' : undefined} rows="4" value={form.story} onChange={(event) => setForm((current) => ({ ...current, story: event.target.value }))} />
           <ErrorMessage>{errors.story}</ErrorMessage>
         </label>
         <label>
           <span>Reward info</span>
-          <textarea rows="3" value={form.rewardInfo} onChange={(event) => setForm((current) => ({ ...current, rewardInfo: event.target.value }))} />
+          <textarea aria-invalid={errors.rewardInfo ? 'true' : undefined} rows="3" value={form.rewardInfo} onChange={(event) => setForm((current) => ({ ...current, rewardInfo: event.target.value }))} />
           <ErrorMessage>{errors.rewardInfo}</ErrorMessage>
         </label>
         <div className="campaign-form__actions">

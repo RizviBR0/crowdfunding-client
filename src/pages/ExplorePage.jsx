@@ -359,11 +359,17 @@ export function CampaignDetailPage() {
 
   return (
     <section className="campaign-detail-page" aria-labelledby="campaign-detail-title">
-      <Link className="campaign-detail-back" to="/explore">
-        <ArrowLeft aria-hidden="true" />
-        Back to Explore
-      </Link>
+      <div className="campaign-detail-nav">
+        <Link className="campaign-detail-back" to="/explore">
+          <ArrowLeft aria-hidden="true" />
+          Back to Explore
+        </Link>
+      </div>
       <div className="campaign-detail-hero">
+        <div className="campaign-detail-media">
+          <img alt="" src={getCampaignImage(campaign)} />
+          <img alt="" className="campaign-detail-media__doodle" src={doodlePaperPlane} />
+        </div>
         <div>
           <p className="home-pill">
             <Sparkles aria-hidden="true" />
@@ -401,10 +407,6 @@ export function CampaignDetailPage() {
               </span>
             </div>
           </dl>
-        </div>
-        <div className="campaign-detail-media">
-          <img alt="" src={getCampaignImage(campaign)} />
-          <img alt="" className="campaign-detail-media__doodle" src={doodlePaperPlane} />
         </div>
       </div>
 
