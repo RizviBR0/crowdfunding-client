@@ -2914,6 +2914,14 @@ input:focus-visible {
   z-index: 2;
 }
 
+.campaign-detail-hero .home-pill {
+  margin: 0 auto 1.25rem;
+}
+
+.campaign-detail-hero .home-pill + h1 {
+  padding-top: 0.35rem;
+}
+
 .explore-hero__media {
   position: relative;
   min-height: 22rem;
@@ -4315,6 +4323,7 @@ input:focus-visible {
 
   .explore-hero,
   .campaign-detail-hero {
+    grid-template-columns: 1fr;
     text-align: center;
   }
 
@@ -4368,6 +4377,7 @@ input:focus-visible {
 
   .campaign-detail-back {
     width: 100%;
+    margin-bottom: 1.75rem;
   }
 }
 
