@@ -27,6 +27,8 @@ vi.mock('../services/campaignService.js', async () => {
     decideCreatorContribution: vi.fn(),
     getCreatorContribution: vi.fn(),
     getCreatorPendingContributions: vi.fn(),
+    getSupporterContributionStats: vi.fn(),
+    listSupporterApprovedContributions: vi.fn(),
   }
 })
 

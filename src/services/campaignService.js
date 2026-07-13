@@ -143,3 +143,31 @@ export const deleteAdminCampaign = async ({ campaignId, reason }) => {
 
   return response.data.data
 }
+
+export const getSupporterContributionStats = async () => {
+  const response = await apiClient.get('/supporter/contributions/stats')
+
+  return response.data.data.stats
+}
+
+export const listSupporterApprovedContributions = async ({ page, limit }) => {
+  const response = await apiClient.get('/supporter/contributions/approved', {
+    params: { page, limit },
+  })
+
+  return {
+    contributions: response.data.data.contributions,
+    meta: response.data.meta,
+  }
+}
+
+export const listSupporterOwnedContributions = async ({ status, page, limit }) => {
+  const response = await apiClient.get('/supporter/contributions', {
+    params: { status, page, limit },
+  })
+
+  return {
+    contributions: response.data.data.contributions,
+    meta: response.data.meta,
+  }
+}

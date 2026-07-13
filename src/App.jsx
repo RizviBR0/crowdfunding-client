@@ -11,6 +11,8 @@ import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
 
+import SupporterContributionsPage from './pages/SupporterContributionsPage.jsx'
+
 function App() {
   return (
     <Routes>
@@ -33,10 +35,7 @@ function App() {
           <Route element={<RoleRoute allowedRole="supporter" />}>
             <Route element={<DashboardHomePage role="supporter" />} path="supporter" />
             <Route element={<ExplorePage surface="dashboard" />} path="supporter/explore" />
-            <Route
-              element={<DashboardPlaceholderPage type="supporterContributions" />}
-              path="supporter/contributions"
-            />
+            <Route element={<SupporterContributionsPage />} path="supporter/contributions" />
             <Route element={<DashboardPlaceholderPage type="supporterCredits" />} path="supporter/credits" />
             <Route element={<DashboardPlaceholderPage type="supporterPayments" />} path="supporter/payments" />
           </Route>
