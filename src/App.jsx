@@ -6,6 +6,7 @@ import AuthPage from './pages/AuthPage.jsx'
 import { DashboardHomePage, DashboardPlaceholderPage } from './pages/DashboardPage.jsx'
 import AdminCampaignPage from './pages/AdminCampaignPage.jsx'
 import CreatorCampaignPage from './pages/CreatorCampaignPage.jsx'
+import CreatorWithdrawalsPage, { CreatorPaymentsPage } from './pages/CreatorWithdrawalsPage.jsx'
 import ExplorePage, { CampaignDetailPage } from './pages/ExplorePage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
@@ -46,8 +47,8 @@ function App() {
             <Route element={<DashboardHomePage role="creator" />} path="creator" />
             <Route element={<CreatorCampaignPage mode="new" />} path="creator/campaigns/new" />
             <Route element={<CreatorCampaignPage mode="list" />} path="creator/campaigns" />
-            <Route element={<DashboardPlaceholderPage type="creatorWithdrawals" />} path="creator/withdrawals" />
-            <Route element={<DashboardPlaceholderPage type="creatorPayments" />} path="creator/payments" />
+            <Route element={<CreatorWithdrawalsPage />} path="creator/withdrawals" />
+            <Route element={<CreatorPaymentsPage />} path="creator/payments" />
           </Route>
           <Route element={<RoleRoute allowedRole="admin" />}>
             <Route element={<DashboardHomePage role="admin" />} path="admin" />
