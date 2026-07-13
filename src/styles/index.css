@@ -1763,9 +1763,11 @@ a {
 }
 
 .dashboard-page__eyebrow {
-  display: inline-flex;
+  display: flex;
+  align-items: center;
   width: max-content;
-  margin: 0 0 0.85rem;
+  min-height: 2.35rem;
+  margin: 0;
   padding: 0.45rem 0.85rem;
   border: 1px solid rgba(145, 69, 247, 0.14);
   border-radius: var(--radius-pill);
@@ -1773,6 +1775,7 @@ a {
   color: var(--purple-deep);
   font-size: 0.82rem;
   font-weight: 900;
+  line-height: 1.2;
 }
 
 .dashboard-page h1 {
@@ -3414,17 +3417,17 @@ input:focus-visible {
 }
 
 .dashboard-page__eyebrow + h1,
-.withdrawal-panel__header .dashboard-page__eyebrow + h2,
-.creator-review-panel__header .dashboard-page__eyebrow + h2 {
-  margin-top: 0.1rem;
+.dashboard-page__eyebrow + h2 {
+  margin-top: 0;
+  padding-top: 0.55rem;
 }
 
 .dashboard-page__hero {
   padding-block: clamp(2rem, 4vw, 3rem);
 }
 
-.dashboard-page__eyebrow {
-  margin-bottom: 1.05rem;
+.dashboard-page .dashboard-page__eyebrow {
+  margin: 0 0 1.25rem;
 }
 
 .dashboard-section,
