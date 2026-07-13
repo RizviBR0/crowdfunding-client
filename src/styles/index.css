@@ -247,13 +247,13 @@ a {
 }
 
 .site-nav__credit svg,
-.site-nav__profile svg {
+.site-nav__user-menu-trigger svg {
   width: 1.2rem;
   height: 1.2rem;
   color: var(--purple);
 }
 
-.site-nav__profile img {
+.site-nav__user-menu-trigger img {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
