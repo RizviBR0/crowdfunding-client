@@ -1521,10 +1521,93 @@ a {
 
 .dashboard-notification,
 .dashboard-nav-toggle {
+  position: relative;
   justify-content: center;
   width: 2.7rem;
   height: 2.7rem;
   border-radius: 50%;
+}
+
+.dashboard-notification-wrap {
+  position: relative;
+}
+
+.dashboard-notification__badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  display: grid;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #ff5f9f;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.dashboard-notification-menu {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: 28rem;
+  overflow: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-soft);
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+}
+
+.dashboard-notification-menu__header,
+.dashboard-notification-menu__item {
+  padding: 0.85rem 1rem;
+}
+
+.dashboard-notification-menu__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.dashboard-notification-menu__header button {
+  border: 0;
+  background: transparent;
+  color: var(--purple-deep);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.dashboard-notification-menu__item {
+  display: grid;
+  gap: 0.35rem;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: #fff;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+}
+
+.dashboard-notification-menu__item:hover,
+.dashboard-notification-menu__item--unread {
+  background: #fbf5ff;
+}
+
+.dashboard-notification-menu__item strong {
+  font-size: 0.82rem;
+}
+
+.dashboard-notification-menu__item small {
+  color: var(--text-soft);
+  font-weight: 800;
 }
 
 .dashboard-user {
@@ -2171,6 +2254,15 @@ a {
   border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow-soft);
+}
+
+.admin-workspace .admin-campaign-toolbar {
+  grid-template-columns: minmax(0, 2fr) minmax(10rem, 1fr);
+}
+
+.admin-workspace .admin-campaign-toolbar input,
+.admin-workspace .admin-campaign-toolbar select {
+  width: 100%;
 }
 
 .admin-status-tabs {
@@ -3158,6 +3250,30 @@ input:focus-visible {
 
 .contribution-panel__locked .button {
   width: 100%;
+}
+
+.campaign-report-form {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.campaign-report-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 900;
+}
+
+.campaign-report-form textarea {
+  min-height: 5rem;
+  width: 100%;
+  border: 1px solid rgba(111, 80, 143, 0.16);
+  border-radius: var(--radius-soft);
+  padding: 0.75rem;
+  font: inherit;
+  resize: vertical;
 }
 
 @keyframes shimmer {

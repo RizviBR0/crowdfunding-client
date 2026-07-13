@@ -26,6 +26,7 @@ import {
   getSupporterContributionStats,
   listSupporterApprovedContributions,
 } from "../services/campaignService.js";
+import { getRoleAnalytics } from "../services/adminService.js";
 
 const roleHomeContent = {
   supporter: {
@@ -62,9 +63,9 @@ const roleHomeContent = {
     description:
       "Your creator dashboard will show launched campaigns, active funding, raised credits, and reviews.",
     stats: [
-      { label: "Campaigns launched", value: "0", icon: BarChart3 },
-      { label: "Active campaigns", value: "0", icon: Clock3 },
-      { label: "Credits raised", value: "0", icon: WalletCards },
+      { label: "Campaigns launched", statKey: "totalCampaigns", value: "0", icon: BarChart3 },
+      { label: "Active campaigns", statKey: "activeCampaigns", value: "0", icon: Clock3 },
+      { label: "Credits raised", statKey: "totalRaised", value: "0", icon: WalletCards },
     ],
     nextPath: "/dashboard/creator/campaigns/new",
     nextLabel: "Add new campaign",
@@ -75,9 +76,9 @@ const roleHomeContent = {
     description:
       "Your admin dashboard will centralize users, campaign approvals, withdrawals, reports, and platform metrics.",
     stats: [
-      { label: "Supporters", value: "0", icon: BarChart3 },
-      { label: "Creators", value: "0", icon: Sparkles },
-      { label: "Available credits", value: "0", icon: WalletCards },
+      { label: "Supporters", statKey: "supporters", value: "0", icon: BarChart3 },
+      { label: "Creators", statKey: "creators", value: "0", icon: Sparkles },
+      { label: "Available credits", statKey: "availableCredits", value: "0", icon: WalletCards },
     ],
     nextPath: "/dashboard/admin/campaigns",
     nextLabel: "Manage campaigns",
@@ -491,9 +492,8 @@ export function DashboardHomePage({ role }) {
   const content = roleHomeContent[role];
 
   const statsQuery = useQuery({
-    enabled: role === "supporter",
-    queryKey: ["supporter-stats"],
-    queryFn: getSupporterContributionStats,
+    queryKey: [`${role}-stats`],
+    queryFn: () => role === "supporter" ? getSupporterContributionStats() : getRoleAnalytics(role),
   });
 
   return (

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { env } from '../config/env.js'
-import { getAccessToken } from './tokenStorage.js'
+import { clearAccessToken, getAccessToken } from './tokenStorage.js'
 
 export const apiClient = axios.create({
   baseURL: env.apiUrl,
@@ -16,6 +16,14 @@ apiClient.interceptors.request.use((config) => {
 
   return config
 })
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) clearAccessToken()
+    return Promise.reject(error)
+  },
+)
 
 export const getApiErrorMessage = (error) =>
   error?.response?.data?.error?.message || error?.message || 'Something went wrong. Please try again.'

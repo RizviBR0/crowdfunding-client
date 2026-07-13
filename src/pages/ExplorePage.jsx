@@ -30,6 +30,7 @@ import EmptyState from '../components/ui/EmptyState.jsx'
 import LoadingState from '../components/ui/LoadingState.jsx'
 import { getApiErrorMessage } from '../lib/api.js'
 import { createContribution, getPublicCampaign, getPublicCampaigns } from '../services/campaignService.js'
+import { createCampaignReport } from '../services/reportService.js'
 
 const categories = ['All', 'Technology', 'Arts & Culture', 'Education', 'Health', 'Community', 'Environment']
 const fallbackImages = [
@@ -276,6 +277,7 @@ export function CampaignDetailPage() {
   const [amount, setAmount] = useState('')
   const [message, setMessage] = useState('')
   const [successContribution, setSuccessContribution] = useState(null)
+  const [reportReason, setReportReason] = useState('')
   const query = useQuery({
     queryKey: ['public-campaign', campaignId],
     queryFn: () => getPublicCampaign(campaignId),
@@ -314,6 +316,10 @@ export function CampaignDetailPage() {
         refreshUser?.(),
       ])
     },
+  })
+  const reportMutation = useMutation({
+    mutationFn: () => createCampaignReport({ campaignId, reason: reportReason.trim() }),
+    onSuccess: () => setReportReason(''),
   })
 
   const submitContribution = (event) => {
@@ -500,6 +506,12 @@ export function CampaignDetailPage() {
               </Link>
             </div>
           )}
+          {user?.role === 'supporter' ? <form className="campaign-report-form" onSubmit={(event) => { event.preventDefault(); if (reportReason.trim().length >= 10) reportMutation.mutate() }}>
+            <label><span>Report a concern</span><textarea maxLength={1000} minLength={10} onChange={(event) => setReportReason(event.target.value)} placeholder="Describe a specific safety concern (10+ characters)." value={reportReason} /></label>
+            {reportMutation.isError ? <p className="form-message form-message--error">{getApiErrorMessage(reportMutation.error)}</p> : null}
+            {reportMutation.isSuccess ? <p className="form-message form-message--success">Thanks. Your report is queued for admin review.</p> : null}
+            <button className="button button--ghost" disabled={reportMutation.isPending || reportReason.trim().length < 10} type="submit">{reportMutation.isPending ? 'Sending report...' : 'Submit report'}</button>
+          </form> : null}
         </aside>
       </div>
     </section>

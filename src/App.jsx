@@ -3,7 +3,7 @@ import { DashboardRoleRedirect, GuestRoute, ProtectedRoute, RoleRoute } from './
 import DashboardLayout from './layouts/DashboardLayout.jsx'
 import PublicLayout from './layouts/PublicLayout.jsx'
 import AuthPage from './pages/AuthPage.jsx'
-import { DashboardHomePage, DashboardPlaceholderPage } from './pages/DashboardPage.jsx'
+import { DashboardHomePage } from './pages/DashboardPage.jsx'
 import AdminCampaignPage from './pages/AdminCampaignPage.jsx'
 import CreatorCampaignPage from './pages/CreatorCampaignPage.jsx'
 import CreatorWithdrawalsPage, { CreatorPaymentsPage } from './pages/CreatorWithdrawalsPage.jsx'
@@ -15,9 +15,13 @@ import SupporterContributionsPage from './pages/SupporterContributionsPage.jsx'
 import SupporterCreditsPage from './pages/SupporterCreditsPage.jsx'
 import SupporterPaymentsPage from './pages/SupporterPaymentsPage.jsx'
 import PaymentSuccessPage from './pages/PaymentSuccessPage.jsx'
+import AdminUsersPage from './pages/AdminUsersPage.jsx'
+import AdminWithdrawalsPage from './pages/AdminWithdrawalsPage.jsx'
+import AdminReportsPage from './pages/AdminReportsPage.jsx'
+import ErrorBoundary from './components/ui/ErrorBoundary.jsx'
 
 function App() {
-  return (
+  return (<ErrorBoundary>
     <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<HomePage />} />
@@ -52,16 +56,16 @@ function App() {
           </Route>
           <Route element={<RoleRoute allowedRole="admin" />}>
             <Route element={<DashboardHomePage role="admin" />} path="admin" />
-            <Route element={<DashboardPlaceholderPage type="adminUsers" />} path="admin/users" />
+            <Route element={<AdminUsersPage />} path="admin/users" />
             <Route element={<AdminCampaignPage />} path="admin/campaigns" />
-            <Route element={<DashboardPlaceholderPage type="adminWithdrawals" />} path="admin/withdrawals" />
-            <Route element={<DashboardPlaceholderPage type="adminReports" />} path="admin/reports" />
+            <Route element={<AdminWithdrawalsPage />} path="admin/withdrawals" />
+            <Route element={<AdminReportsPage />} path="admin/reports" />
           </Route>
           <Route element={<NotFoundPage />} path="*" />
         </Route>
       </Route>
     </Routes>
-  )
+  </ErrorBoundary>)
 }
 
 export default App

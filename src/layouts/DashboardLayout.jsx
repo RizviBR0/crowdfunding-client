@@ -1,15 +1,45 @@
-import { useState } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell, LogOut, Menu, UserCircle, WalletCards, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth.js'
 import BrandLogo from '../components/brand/BrandLogo.jsx'
 import Button from '../components/ui/Button.jsx'
 import { siteConfig } from '../config/site.js'
+import { getApiErrorMessage } from '../lib/api.js'
+import { getNotifications, markAllNotificationsRead, markNotificationRead } from '../services/notificationService.js'
+
+function NotificationMenu({ isOpen, onClose }) {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const query = useQuery({ queryKey: ['notifications'], queryFn: () => getNotifications({ limit: 20 }), enabled: isOpen })
+  const readMutation = useMutation({ mutationFn: markNotificationRead, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }) })
+  const allReadMutation = useMutation({ mutationFn: markAllNotificationsRead, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }) })
+  if (!isOpen) return null
+  const notifications = query.data?.notifications ?? []
+  return <div aria-label="Notifications" className="dashboard-notification-menu" role="dialog">
+    <div className="dashboard-notification-menu__header"><strong>Notifications</strong><button disabled={allReadMutation.isPending || notifications.every((item) => item.readAt)} onClick={() => allReadMutation.mutate()} type="button">Mark all read</button></div>
+    {query.isLoading ? <p>Loading notifications…</p> : null}
+    {query.isError ? <p className="form-message form-message--error">{getApiErrorMessage(query.error)}</p> : null}
+    {!query.isLoading && notifications.length === 0 ? <p>No new updates yet.</p> : null}
+    {notifications.map((item) => <button className={`dashboard-notification-menu__item${item.readAt ? '' : ' dashboard-notification-menu__item--unread'}`} key={item.id} onClick={() => { if (!item.readAt) readMutation.mutate(item.id); onClose(); if (item.actionRoute) navigate(item.actionRoute) }} type="button"><strong>{item.message}</strong><small>{item.time ? new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(item.time)) : ''}</small></button>)}
+  </div>
+}
 
 function DashboardLayout() {
   const { logout, user } = useAuth()
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const notificationRef = useRef(null)
   const navigation = siteConfig.dashboardNavigation[user?.role] || []
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) setIsNotificationsOpen(false)
+    }
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [])
 
   return (
     <div className="dashboard-layout">
@@ -22,9 +52,12 @@ function DashboardLayout() {
               <WalletCards aria-hidden="true" />
               {user?.credits ?? 0} credits
             </span>
-            <button aria-label="Open notifications" className="dashboard-notification" type="button">
+            <div className="dashboard-notification-wrap" ref={notificationRef}>
+            <button aria-expanded={isNotificationsOpen} aria-label="Open notifications" className="dashboard-notification" onClick={() => setIsNotificationsOpen((current) => !current)} type="button">
               <Bell aria-hidden="true" />
             </button>
+            <NotificationMenu isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
+            </div>
             <div className="dashboard-user">
               {user?.photoUrl ? <img alt="" src={user.photoUrl} /> : <UserCircle aria-hidden="true" />}
               <span>
