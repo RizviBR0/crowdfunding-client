@@ -1760,7 +1760,7 @@ a {
     radial-gradient(circle at 8% 94%, rgba(255, 155, 211, 0.24), transparent 8rem),
     rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow-soft);
-  padding: clamp(1.25rem, 4vw, 2rem);
+  padding: clamp(2.5rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .dashboard-page__eyebrow {
@@ -2850,10 +2850,15 @@ input:focus-visible {
   background: transparent;
 }
 
+.explore-page > .state-block {
+  width: min(calc(100% - 2rem), var(--max-width));
+  margin: 0 auto;
+}
+
 .explore-hero,
 .campaign-detail-hero,
 .campaign-detail-body {
-  width: min(100%, var(--max-width));
+  width: min(calc(100% - 2rem), var(--max-width));
   margin: 0 auto;
 }
 
@@ -2885,6 +2890,8 @@ input:focus-visible {
   letter-spacing: 0;
   line-height: 1.14;
   text-wrap: balance;
+  position: relative;
+  z-index: 2;
 }
 
 .explore-hero h1,
@@ -2900,6 +2907,8 @@ input:focus-visible {
   max-width: 42rem;
   margin: 1rem 0 0;
   color: var(--text-soft);
+  position: relative;
+  z-index: 2;
 }
 
 .explore-hero__media {
@@ -2930,6 +2939,7 @@ input:focus-visible {
 .explore-doodle {
   position: absolute;
   pointer-events: none;
+  z-index: 0;
 }
 
 .explore-doodle--loop {
@@ -2949,8 +2959,8 @@ input:focus-visible {
   grid-template-columns: minmax(13rem, 1.5fr) minmax(11rem, 0.9fr) repeat(2, minmax(9rem, 0.8fr)) auto;
   gap: 0.85rem;
   align-items: end;
-  width: min(100%, var(--max-width));
-  margin: 1.75rem auto 1.5rem;
+  width: min(calc(100% - 2rem), var(--max-width));
+  margin: 3rem auto 2.5rem;
   padding: 1rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-card);
@@ -2999,7 +3009,7 @@ input:focus-visible {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.2rem;
-  width: min(100%, var(--max-width));
+  width: min(calc(100% - 2rem), var(--max-width));
   margin: 0 auto;
 }
 
@@ -3098,7 +3108,7 @@ input:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  width: min(100%, var(--max-width));
+  width: min(calc(100% - 2rem), var(--max-width));
   margin: 1.5rem auto 0;
 }
 
