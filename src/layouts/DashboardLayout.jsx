@@ -90,7 +90,7 @@ function DashboardLayout() {
             {navigation.map((item) => (
               <NavLink
                 className="dashboard-sidebar__link"
-                end={item.href === `/dashboard/${user?.role}`}
+                end
                 key={item.href}
                 onClick={() => setIsNavOpen(false)}
                 to={item.href}
