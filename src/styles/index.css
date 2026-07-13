@@ -187,6 +187,7 @@ a {
   color: var(--text-main);
   font-size: 0.94rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .site-nav__link {
@@ -217,6 +218,7 @@ a {
   padding: 0.68rem 1rem;
   border-radius: var(--radius-pill);
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .site-nav__register {
@@ -1523,6 +1525,7 @@ a {
   padding: 0.62rem 0.85rem;
   border-radius: var(--radius-pill);
   font-weight: 900;
+  white-space: nowrap;
 }
 
 .dashboard-credit svg,
@@ -1631,6 +1634,7 @@ a {
   min-height: 2.9rem;
   padding: 0.35rem 0.75rem 0.35rem 0.4rem;
   border-radius: var(--radius-pill);
+  white-space: nowrap;
 }
 
 .dashboard-user img,
@@ -2580,6 +2584,7 @@ a {
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   font-weight: 800;
+  white-space: nowrap;
   transition:
     transform 150ms ease,
     box-shadow 150ms ease,
@@ -3298,6 +3303,17 @@ input:focus-visible {
 @keyframes shimmer {
   to {
     transform: translateX(100%);
+  }
+}
+
+@media (max-width: 1220px) and (min-width: 1061px) {
+  .site-nav {
+    gap: 0.75rem;
+    width: min(calc(100% - 2rem), var(--max-width));
+  }
+  .site-nav__links,
+  .site-nav__actions {
+    gap: 0.85rem;
   }
 }
 
