@@ -1267,10 +1267,10 @@ a {
 }
 
 .auth-card h1 {
-  max-width: 12ch;
+  max-width: 18ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.3rem, 5vw, 4rem);
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
   line-height: 1.12;
   letter-spacing: 0;
 }
@@ -3215,8 +3215,8 @@ input:focus-visible {
   }
 
   .auth-card h1 {
-    max-width: 13ch;
-    font-size: clamp(2rem, 10vw, 3rem);
+    max-width: 18ch;
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
   }
 
   .auth-card__panel--intro > p:not(.auth-eyebrow) {
