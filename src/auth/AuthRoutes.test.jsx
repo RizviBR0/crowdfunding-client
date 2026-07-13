@@ -14,6 +14,18 @@ vi.mock('../services/authService.js', () => ({
   restoreSession: vi.fn(),
 }))
 
+vi.mock('../services/campaignService.js', async () => {
+  const actual = await vi.importActual('../services/campaignService.js')
+
+  return {
+    ...actual,
+    getCreatorPendingContributions: vi.fn().mockResolvedValue({
+      contributions: [],
+      meta: { page: 1, limit: 10, totalItems: 0, totalPages: 0 },
+    }),
+  }
+})
+
 const renderAt = (path) => {
   window.history.pushState({}, '', path)
 

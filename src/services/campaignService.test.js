@@ -4,12 +4,15 @@ import {
   createCampaign,
   createContribution,
   decideAdminCampaign,
+  decideCreatorContribution,
   deleteAdminCampaign,
   deleteCampaign,
+  getCreatorContribution,
   getPublicCampaign,
   getPublicCampaigns,
   getAdminCampaigns,
   getCreatorCampaigns,
+  getCreatorPendingContributions,
   suspendAdminCampaign,
   updateCampaign,
 } from './campaignService.js'
@@ -160,6 +163,61 @@ describe('campaign service', () => {
       {
         headers: {
           'Idempotency-Key': 'contribution-key-1',
+        },
+      },
+    )
+  })
+
+  it('loads and decides creator contribution review records', async () => {
+    apiClient.get
+      .mockResolvedValueOnce({
+        data: {
+          data: { contributions: [{ id: 'contribution_1', status: 'pending' }] },
+          meta: { page: 1, totalItems: 1 },
+        },
+      })
+      .mockResolvedValueOnce({
+        data: {
+          data: {
+            contribution: {
+              id: 'contribution_1',
+              message: 'Please build this.',
+              status: 'pending',
+            },
+          },
+        },
+      })
+    apiClient.patch.mockResolvedValue({
+      data: { data: { contribution: { id: 'contribution_1', status: 'approved' } } },
+    })
+
+    await expect(getCreatorPendingContributions({ page: 1, limit: 10 })).resolves.toEqual({
+      contributions: [{ id: 'contribution_1', status: 'pending' }],
+      meta: { page: 1, totalItems: 1 },
+    })
+    await expect(getCreatorContribution('contribution_1')).resolves.toEqual({
+      id: 'contribution_1',
+      message: 'Please build this.',
+      status: 'pending',
+    })
+    await expect(
+      decideCreatorContribution({
+        contributionId: 'contribution_1',
+        decision: 'approved',
+        idempotencyKey: 'decision-key-1',
+      }),
+    ).resolves.toEqual({ id: 'contribution_1', status: 'approved' })
+
+    expect(apiClient.get).toHaveBeenNthCalledWith(1, '/creator/contributions/pending', {
+      params: { page: 1, limit: 10 },
+    })
+    expect(apiClient.get).toHaveBeenNthCalledWith(2, '/creator/contributions/contribution_1')
+    expect(apiClient.patch).toHaveBeenCalledWith(
+      '/creator/contributions/contribution_1/decision',
+      { decision: 'approved' },
+      {
+        headers: {
+          'Idempotency-Key': 'decision-key-1',
         },
       },
     )

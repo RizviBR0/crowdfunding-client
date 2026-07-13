@@ -1,6 +1,19 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, BarChart3, Clock3, Sparkles, WalletCards } from 'lucide-react'
+import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ArrowRight, BarChart3, CheckCircle2, Clock3, Eye, RefreshCw, Sparkles, WalletCards, XCircle } from 'lucide-react'
 import { useAuth } from '../auth/useAuth.js'
+import Button from '../components/ui/Button.jsx'
+import DataTable from '../components/ui/DataTable.jsx'
+import EmptyState from '../components/ui/EmptyState.jsx'
+import LoadingState from '../components/ui/LoadingState.jsx'
+import Modal from '../components/ui/Modal.jsx'
+import { getApiErrorMessage } from '../lib/api.js'
+import {
+  decideCreatorContribution,
+  getCreatorContribution,
+  getCreatorPendingContributions,
+} from '../services/campaignService.js'
 
 const roleHomeContent = {
   supporter: {
@@ -104,6 +117,208 @@ const routeContent = {
   },
 }
 
+const formatCredits = (value) => `${Number(value ?? 0).toLocaleString()} credits`
+
+const createIdempotencyKey = () =>
+  globalThis.crypto?.randomUUID?.() ?? `creator-decision-${Date.now()}-${Math.random().toString(36).slice(2)}`
+
+function ContributionDetailDialog({ contributionId, isOpen, onClose }) {
+  const detailQuery = useQuery({
+    enabled: isOpen && Boolean(contributionId),
+    queryKey: ['creator-contribution', contributionId],
+    queryFn: () => getCreatorContribution(contributionId),
+  })
+  const contribution = detailQuery.data
+
+  return (
+    <Modal
+      description="Review the supporter message and contribution details before deciding."
+      isOpen={isOpen}
+      onClose={onClose}
+      title="View contribution"
+    >
+      {detailQuery.isLoading ? <LoadingState label="Loading contribution detail" /> : null}
+      {detailQuery.isError ? (
+        <EmptyState
+          action={<Button icon={RefreshCw} onClick={() => detailQuery.refetch()} variant="secondary">Try again</Button>}
+          description={getApiErrorMessage(detailQuery.error)}
+          title="Contribution detail could not load"
+        />
+      ) : null}
+      {contribution ? (
+        <div className="contribution-detail">
+          <dl>
+            <div>
+              <dt>Supporter</dt>
+              <dd>{contribution.supporterName}</dd>
+            </div>
+            <div>
+              <dt>Campaign</dt>
+              <dd>{contribution.campaignTitle}</dd>
+            </div>
+            <div>
+              <dt>Amount</dt>
+              <dd>{formatCredits(contribution.amount)}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd><span className={`status-chip status-chip--${contribution.status}`}>{contribution.status}</span></dd>
+            </div>
+          </dl>
+          <article>
+            <h4>Supporter message</h4>
+            <p>{contribution.message || 'No message was included with this contribution.'}</p>
+          </article>
+        </div>
+      ) : null}
+    </Modal>
+  )
+}
+
+function CreatorContributionReview() {
+  const queryClient = useQueryClient()
+  const [selectedContributionId, setSelectedContributionId] = useState(null)
+  const [statusMessage, setStatusMessage] = useState('')
+  const [statusVariant, setStatusVariant] = useState('success')
+  const contributionsQuery = useQuery({
+    queryKey: ['creator-contributions', 'pending', 1],
+    queryFn: () => getCreatorPendingContributions({ page: 1, limit: 10 }),
+  })
+  const contributions = contributionsQuery.data?.contributions ?? []
+
+  const decisionMutation = useMutation({
+    mutationFn: ({ contributionId, decision }) =>
+      decideCreatorContribution({
+        contributionId,
+        decision,
+        idempotencyKey: createIdempotencyKey(),
+      }),
+    onSuccess: async (contribution) => {
+      setStatusVariant('success')
+      setStatusMessage(
+        contribution.status === 'approved'
+          ? 'Contribution approved. Raised credits were updated.'
+          : 'Contribution rejected. Supporter credits were refunded.',
+      )
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['creator-contributions'] }),
+        queryClient.invalidateQueries({ queryKey: ['creator-contribution', contribution.id] }),
+        queryClient.invalidateQueries({ queryKey: ['creator-campaigns'] }),
+      ])
+    },
+    onError: (error) => {
+      setStatusVariant('error')
+      setStatusMessage(getApiErrorMessage(error))
+    },
+  })
+
+  const decide = (contribution, decision) => {
+    setStatusMessage('')
+    setStatusVariant('success')
+    decisionMutation.mutate({ contributionId: contribution.id, decision })
+  }
+
+  const columns = [
+    { key: 'supporterName', label: 'Supporter' },
+    {
+      key: 'campaignTitle',
+      label: 'Campaign',
+      render: (contribution) => (
+        <span className="campaign-title-cell">
+          <strong>{contribution.campaignTitle}</strong>
+          <small>{contribution.status}</small>
+        </span>
+      ),
+    },
+    {
+      key: 'amount',
+      label: 'Amount',
+      align: 'right',
+      render: (contribution) => formatCredits(contribution.amount),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (contribution) => (
+        <span className="campaign-row-actions contribution-review-actions">
+          <button
+            aria-label={`View contribution from ${contribution.supporterName}`}
+            onClick={() => setSelectedContributionId(contribution.id)}
+            type="button"
+          >
+            <Eye aria-hidden="true" />
+          </button>
+          <button
+            aria-label={`Approve contribution from ${contribution.supporterName}`}
+            disabled={decisionMutation.isPending}
+            onClick={() => decide(contribution, 'approved')}
+            type="button"
+          >
+            <CheckCircle2 aria-hidden="true" />
+          </button>
+          <button
+            aria-label={`Reject contribution from ${contribution.supporterName}`}
+            disabled={decisionMutation.isPending}
+            onClick={() => decide(contribution, 'rejected')}
+            type="button"
+          >
+            <XCircle aria-hidden="true" />
+          </button>
+        </span>
+      ),
+    },
+  ]
+
+  return (
+    <section className="creator-review-panel" aria-labelledby="creator-review-title">
+      <div className="creator-review-panel__header">
+        <div>
+          <p className="dashboard-page__eyebrow">Contributions to review</p>
+          <h2 id="creator-review-title">Pending supporter contributions</h2>
+          <p>Approve real support into raised credits, or reject and refund the supporter instantly.</p>
+        </div>
+        <Button
+          disabled={contributionsQuery.isFetching}
+          icon={RefreshCw}
+          onClick={() => contributionsQuery.refetch()}
+          variant="secondary"
+        >
+          Refresh
+        </Button>
+      </div>
+
+      {statusMessage ? (
+        <p aria-live="polite" className={`form-message form-message--${statusVariant}`}>
+          {statusMessage}
+        </p>
+      ) : null}
+      {contributionsQuery.isLoading ? <LoadingState label="Loading pending contributions" /> : null}
+      {contributionsQuery.isError ? (
+        <EmptyState
+          action={<Button icon={RefreshCw} onClick={() => contributionsQuery.refetch()} variant="secondary">Try again</Button>}
+          description={getApiErrorMessage(contributionsQuery.error)}
+          title="Pending contributions could not load"
+        />
+      ) : null}
+      {!contributionsQuery.isLoading && !contributionsQuery.isError && contributions.length === 0 ? (
+        <EmptyState
+          description="New supporter contributions will appear here for approval or refund decisions."
+          title="No pending contributions"
+        />
+      ) : null}
+      {contributions.length > 0 ? (
+        <DataTable caption="Pending creator contribution review" columns={columns} rows={contributions} />
+      ) : null}
+
+      <ContributionDetailDialog
+        contributionId={selectedContributionId}
+        isOpen={Boolean(selectedContributionId)}
+        onClose={() => setSelectedContributionId(null)}
+      />
+    </section>
+  )
+}
+
 export function DashboardHomePage({ role }) {
   const { user } = useAuth()
   const content = roleHomeContent[role]
@@ -136,6 +351,8 @@ export function DashboardHomePage({ role }) {
           )
         })}
       </div>
+
+      {role === 'creator' ? <CreatorContributionReview /> : null}
     </section>
   )
 }

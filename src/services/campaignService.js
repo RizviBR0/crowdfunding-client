@@ -79,6 +79,37 @@ export const createContribution = async ({ campaignId, amount, message = '', ide
   return response.data.data.contribution
 }
 
+export const getCreatorPendingContributions = async ({ page = 1, limit = 10 } = {}) => {
+  const response = await apiClient.get('/creator/contributions/pending', {
+    params: { page, limit },
+  })
+
+  return {
+    contributions: response.data.data.contributions,
+    meta: response.data.meta,
+  }
+}
+
+export const getCreatorContribution = async (contributionId) => {
+  const response = await apiClient.get(`/creator/contributions/${contributionId}`)
+
+  return response.data.data.contribution
+}
+
+export const decideCreatorContribution = async ({ contributionId, decision, idempotencyKey }) => {
+  const response = await apiClient.patch(
+    `/creator/contributions/${contributionId}/decision`,
+    { decision },
+    {
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+    },
+  )
+
+  return response.data.data.contribution
+}
+
 export const getAdminCampaigns = async ({ status = 'pending', search = '', page = 1, limit = 10 } = {}) => {
   const response = await apiClient.get('/admin/campaigns', {
     params: { status, search, page, limit },

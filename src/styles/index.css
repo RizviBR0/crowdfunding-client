@@ -1622,6 +1622,101 @@ a {
   font-weight: 800;
 }
 
+.creator-review-panel {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid rgba(111, 80, 143, 0.14);
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(circle at 92% 12%, rgba(127, 197, 255, 0.16), transparent 8rem),
+    rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow-soft);
+}
+
+.creator-review-panel__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.creator-review-panel__header h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+
+.creator-review-panel__header p:not(.dashboard-page__eyebrow) {
+  margin: 0.5rem 0 0;
+  color: var(--text-soft);
+}
+
+.contribution-review-actions button:nth-child(2) {
+  color: var(--success);
+}
+
+.contribution-review-actions button:nth-child(3) {
+  color: var(--attention);
+}
+
+.campaign-row-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.contribution-detail {
+  display: grid;
+  gap: 1rem;
+}
+
+.contribution-detail dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.contribution-detail dl div,
+.contribution-detail article {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-soft);
+  background: #fffafd;
+}
+
+.contribution-detail dt {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.contribution-detail dd {
+  margin: 0.2rem 0 0;
+  color: var(--text-main);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.contribution-detail h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.contribution-detail p {
+  margin: 0.55rem 0 0;
+  color: var(--text-soft);
+}
+
 .campaign-workspace {
   gap: 1rem;
 }
@@ -3058,6 +3153,15 @@ input:focus-visible {
 
   .dashboard-stat-grid {
     grid-template-columns: 1fr;
+  }
+
+  .creator-review-panel__header,
+  .contribution-detail dl {
+    grid-template-columns: 1fr;
+  }
+
+  .creator-review-panel__header {
+    display: grid;
   }
 
   .admin-campaign-hero {
