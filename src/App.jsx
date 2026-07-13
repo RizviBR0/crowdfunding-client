@@ -10,8 +10,10 @@ import ExplorePage, { CampaignDetailPage } from './pages/ExplorePage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
-
 import SupporterContributionsPage from './pages/SupporterContributionsPage.jsx'
+import SupporterCreditsPage from './pages/SupporterCreditsPage.jsx'
+import SupporterPaymentsPage from './pages/SupporterPaymentsPage.jsx'
+import PaymentSuccessPage from './pages/PaymentSuccessPage.jsx'
 
 function App() {
   return (
@@ -36,8 +38,9 @@ function App() {
             <Route element={<DashboardHomePage role="supporter" />} path="supporter" />
             <Route element={<ExplorePage surface="dashboard" />} path="supporter/explore" />
             <Route element={<SupporterContributionsPage />} path="supporter/contributions" />
-            <Route element={<DashboardPlaceholderPage type="supporterCredits" />} path="supporter/credits" />
-            <Route element={<DashboardPlaceholderPage type="supporterPayments" />} path="supporter/payments" />
+            <Route element={<SupporterCreditsPage />} path="supporter/credits" />
+            <Route element={<SupporterPaymentsPage />} path="supporter/payments" />
+            <Route element={<PaymentSuccessPage />} path="supporter/payments/success" />
           </Route>
           <Route element={<RoleRoute allowedRole="creator" />}>
             <Route element={<DashboardHomePage role="creator" />} path="creator" />
