@@ -31,6 +31,8 @@ import educationLaptopKids from '../assets/education-laptop-kids.png'
 import kidsReadingLibrary from '../assets/kids-reading-library.png'
 import mobileClinicSupport from '../assets/mobile-clinic-support.png'
 import robotPrototype from '../assets/robot-prototype.png'
+import scallopedDividerLavender from '../assets/scalloped-divider-lavender.svg'
+import cloudSvg from '../assets/cloud.svg'
 import { getHomepageData } from '../services/homeService.js'
 
 const fallbackCampaigns = [
@@ -243,27 +245,36 @@ function HomePage() {
         </Swiper>
       </section>
 
-      <section className="home-impact" aria-label="FundBloom impact">
-        <article>
-          <strong>{formatCredits(128000)}+</strong>
-          <span>Supporters</span>
-          <p>People backing what matters</p>
-        </article>
-        <article>
-          <strong>{formatCredits(impact.approvedCampaigns)}+</strong>
-          <span>Campaigns</span>
-          <p>Ideas turned into impact</p>
-        </article>
-        <article>
-          <strong>{formatCredits(impact.totalRaisedCredits)}+</strong>
-          <span>Credits Raised</span>
-          <p>Powering real-world change</p>
-        </article>
-        <article>
-          <strong>{supportRate}%</strong>
-          <span>Momentum</span>
-          <p>Approved goals already funded</p>
-        </article>
+      <section className="home-impact-section" aria-label="FundBloom impact">
+        <div className="home-impact">
+          <div className="home-impact__blob"></div>
+          <div className="home-impact__intro">
+            <h2>Numbers That Tell Our Story</h2>
+            <p>Behind every number is a child's laugh, a parent's peace of mind, and a team that truly cares every single day.</p>
+          </div>
+          <div className="home-impact__stats">
+            <article>
+              <strong>{formatCredits(128000)}+</strong>
+              <span>Supporters</span>
+            </article>
+            <article>
+              <strong>{formatCredits(impact.approvedCampaigns)}+</strong>
+              <span>Campaigns</span>
+            </article>
+            <article>
+              <strong>{formatCredits(impact.totalRaisedCredits)}+</strong>
+              <span>Credits Raised</span>
+            </article>
+            <article>
+              <strong>{supportRate}%</strong>
+              <span>Momentum</span>
+            </article>
+          </div>
+        </div>
+        <div className="home-impact__clouds">
+          <img alt="" className="cloud-lavender" src={scallopedDividerLavender} />
+          <img alt="" className="cloud-white" src={cloudSvg} />
+        </div>
       </section>
 
       <section className="home-section home-section--campaigns" aria-labelledby="top-funded-title">
