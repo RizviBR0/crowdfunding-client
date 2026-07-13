@@ -63,15 +63,19 @@ describe('public layout shell', () => {
     expect(screen.getByRole('link', { name: /back to home/i })).toHaveAttribute('href', '/')
   })
 
-  it('supports the logged-in navbar variant without auth logic', () => {
+  it('supports the logged-in navbar variant without auth logic', async () => {
+    const user = userEvent.setup()
+
     render(
       <MemoryRouter>
         <PublicNavbar viewer={{ credits: 75, displayName: 'Asha' }} />
       </MemoryRouter>,
     )
 
+    await user.click(screen.getByRole('button', { name: /asha/i }))
+
     expect(screen.getByText('75 credits')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /asha/i })).toHaveAttribute('href', '/dashboard')
+    expect(screen.getByRole('link', { name: /75 credits/i })).toHaveAttribute('href', '/dashboard')
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument()
   })
 })

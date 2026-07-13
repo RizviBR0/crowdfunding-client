@@ -1,6 +1,12 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Github, Linkedin, Facebook } from 'lucide-react'
 import BrandLogo from '../brand/BrandLogo.jsx'
 import { siteConfig } from '../../config/site.js'
+
+const iconMap = {
+  GitHub: <Github aria-hidden="true" />,
+  LinkedIn: <Linkedin aria-hidden="true" />,
+  Facebook: <Facebook aria-hidden="true" />,
+}
 
 function PublicFooter() {
   return (
@@ -20,7 +26,7 @@ function PublicFooter() {
                 rel="noreferrer"
                 target="_blank"
               >
-                {link.shortLabel}
+                {iconMap[link.label] || link.shortLabel}
               </a>
             ))}
           </div>

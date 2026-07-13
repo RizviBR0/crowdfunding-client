@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ArrowUpRight, LayoutDashboard, LogOut, Menu, WalletCards, X } from 'lucide-react'
 import BrandLogo from '../brand/BrandLogo.jsx'
@@ -8,8 +8,20 @@ import { siteConfig } from '../../config/site.js'
 
 function PublicNavbar({ viewer = null, onLogout }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const profileMenuRef = useRef(null)
   const isLoggedIn = Boolean(viewer)
   const closeMenu = () => setIsMenuOpen(false)
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <header className="site-header">
@@ -26,19 +38,32 @@ function PublicNavbar({ viewer = null, onLogout }) {
 
         <div className="site-nav__actions">
           {isLoggedIn ? (
-            <>
-              <Link className="site-nav__credit" to="/dashboard">
-                <WalletCards aria-hidden="true" />
-                <span>{viewer.credits ?? 0} credits</span>
-              </Link>
-              <Link className="site-nav__profile" to="/dashboard">
+            <div className="site-nav__user-menu" ref={profileMenuRef}>
+              <button
+                className="site-nav__user-menu-trigger"
+                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                aria-haspopup="true"
+                aria-expanded={isProfileMenuOpen}
+              >
                 <UserAvatar user={viewer} />
-                <span>{viewer.displayName || 'Dashboard'}</span>
-              </Link>
-              <Button icon={LogOut} onClick={onLogout} variant="ghost">
-                Logout
-              </Button>
-            </>
+              </button>
+
+              {isProfileMenuOpen && (
+                <div className="site-nav__user-dropdown">
+                  <div className="user-dropdown__header">
+                    <span className="user-dropdown__name">{viewer.displayName || 'User'}</span>
+                  </div>
+                  <Link className="user-dropdown__item" to="/dashboard" onClick={() => setIsProfileMenuOpen(false)}>
+                    <WalletCards aria-hidden="true" size={16} />
+                    <span>{viewer.credits ?? 0} credits</span>
+                  </Link>
+                  <button className="user-dropdown__item user-dropdown__logout" onClick={onLogout}>
+                    <LogOut aria-hidden="true" size={16} />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <>
               <Link className="site-nav__auth" to="/login">
