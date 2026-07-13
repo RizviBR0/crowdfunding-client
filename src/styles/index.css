@@ -659,9 +659,9 @@ a {
 .home-impact-section {
   position: relative;
   isolation: isolate;
-  min-height: clamp(28rem, 34vw, 34rem);
+  min-height: auto;
   margin-top: 0;
-  padding: 0;
+  padding: 0 0 clamp(8rem, 12vw, 10rem);
   overflow: hidden;
   background: #fff;
 }
@@ -671,7 +671,7 @@ a {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   gap: clamp(1.5rem, 4vw, 4rem);
-  width: min(calc(100% - 2rem), 103rem);
+  width: min(calc(100% - 20%), 103rem);
   min-height: clamp(17rem, 16vw, 19rem);
   margin: 0 auto;
   align-items: center;
@@ -754,7 +754,7 @@ a {
   right: 0;
   bottom: 0;
   left: 0;
-  height: clamp(18rem, 24vw, 25rem);
+  height: clamp(12rem, 16vw, 14rem);
   pointer-events: none;
   overflow: visible;
 }
@@ -762,7 +762,7 @@ a {
 .home-impact__clouds::after {
   position: absolute;
   z-index: 2;
-  top: 12rem;
+  top: clamp(6rem, 8vw, 7.5rem);
   right: 0;
   bottom: 0;
   left: 0;
@@ -782,13 +782,13 @@ a {
 
 .home-impact__clouds .cloud-lavender {
   z-index: 1;
-  bottom: 2.5rem;
+  bottom: 1.5rem;
 }
 
 .home-impact__clouds .cloud-white {
   z-index: 3;
   transform: rotate(180deg);
-  bottom: 3rem;
+  bottom: 1rem;
 }
 
 .home-section {
@@ -3393,9 +3393,9 @@ input:focus-visible {
   }
 
   .home-impact-section {
-    min-height: 31rem;
+    min-height: auto;
     padding-top: 2rem;
-    padding-bottom: 8rem;
+    padding-bottom: 5.5rem;
   }
 
   .home-impact__stats {
@@ -3416,7 +3416,7 @@ input:focus-visible {
   }
 
   .home-impact__clouds .cloud-white {
-    bottom: -2.25rem;
+    bottom: -1.5rem;
   }
 
   .home-section {
