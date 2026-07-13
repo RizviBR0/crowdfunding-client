@@ -29,7 +29,8 @@ Features:
 - Website name: FundBloom
 - Admin username/email: configured through the server `ADMIN_BOOTSTRAP_EMAILS` environment variable for the assessment deployment.
 - Admin password: managed by Firebase Authentication and intentionally not committed to this repository.
-- Live frontend URL: deployment URL is environment-specific and is not configured in this local workspace.
+- Live frontend URL: https://crowdfunding-client-indol.vercel.app
+- Live API URL: https://crowdfunding-server-cyan.vercel.app
 - Client repository: https://github.com/RizviBR0/crowdfunding-client
 - Server repository: https://github.com/RizviBR0/crowdfunding-server
 
