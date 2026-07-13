@@ -202,10 +202,6 @@ function HomePage() {
   })
   const campaigns = data?.campaigns?.length ? data.campaigns : fallbackCampaigns
   const impact = data?.impact ?? fallbackImpact
-  const supportRate = impact.totalFundingGoal
-    ? Math.min(100, Math.round((impact.totalRaisedCredits / impact.totalFundingGoal) * 100))
-    : 0
-
   return (
     <div className="home-page">
       <section className="home-hero" aria-label="Featured FundBloom stories">
@@ -264,10 +260,6 @@ function HomePage() {
             <article>
               <strong>{formatCredits(impact.totalRaisedCredits)}+</strong>
               <span>Credits Raised</span>
-            </article>
-            <article>
-              <strong>{supportRate}%</strong>
-              <span>Momentum</span>
             </article>
           </div>
         </div>
