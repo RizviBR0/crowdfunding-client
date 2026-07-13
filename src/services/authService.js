@@ -16,8 +16,8 @@ export const restoreSession = async () => {
   return response.data.data.user
 }
 
-export const exchangeSession = async ({ firebaseUser, intendedRole }) => {
-  const firebaseIdToken = await firebaseUser.getIdToken()
+export const exchangeSession = async ({ firebaseUser, intendedRole, forceRefresh = false }) => {
+  const firebaseIdToken = await firebaseUser.getIdToken(forceRefresh)
   const response = await apiClient.post('/auth/session', {
     firebaseIdToken,
     intendedRole,
@@ -28,17 +28,22 @@ export const exchangeSession = async ({ firebaseUser, intendedRole }) => {
 }
 
 export const registerWithEmail = async ({ name, email, password, role, photoFile, photoUrl }) => {
-  const uploadedPhotoUrl = await uploadProfileImage(photoFile)
+  const uploadedPhotoUrl = photoFile ? await uploadProfileImage(photoFile) : ''
   const finalPhotoUrl = uploadedPhotoUrl || photoUrl || ''
   const auth = getFirebaseAuth()
   const credential = await createUserWithEmailAndPassword(auth, email, password)
 
-  await updateProfile(credential.user, {
+  const profile = {
     displayName: name,
-    photoURL: finalPhotoUrl,
-  })
+  }
 
-  return exchangeSession({ firebaseUser: credential.user, intendedRole: role })
+  if (finalPhotoUrl) {
+    profile.photoURL = finalPhotoUrl
+  }
+
+  await updateProfile(credential.user, profile)
+
+  return exchangeSession({ firebaseUser: credential.user, intendedRole: role, forceRefresh: true })
 }
 
 export const loginWithEmail = async ({ email, password }) => {

@@ -10,9 +10,9 @@ const dashboardHomeByRole = {
 const getDashboardHomeForRole = (role) => dashboardHomeByRole[role] || '/dashboard'
 
 function AuthGate({ children }) {
-  const { isAuthLoading, isAuthRestored } = useAuth()
+  const { isAuthRestored } = useAuth()
 
-  if (!isAuthRestored || isAuthLoading) {
+  if (!isAuthRestored) {
     return (
       <section className="auth-gate" aria-live="polite">
         <p>Loading your FundBloom session...</p>

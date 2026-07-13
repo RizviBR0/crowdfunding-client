@@ -35,8 +35,8 @@ describe('auth pages', () => {
     expect(within(form).getByLabelText(/email/i)).toBeInTheDocument()
     expect(within(form).getByLabelText(/^password$/i)).toBeInTheDocument()
     expect(within(form).getByLabelText(/role/i)).toHaveValue('supporter')
-    expect(within(form).getByLabelText(/profile picture url/i)).toBeInTheDocument()
-    expect(within(form).getByLabelText(/upload image/i)).toBeInTheDocument()
+    expect(within(form).getByText(/profile picture/i)).toBeInTheDocument()
+    expect(within(form).getByText(/click to upload image/i)).toBeInTheDocument()
   })
 
   it('validates weak registration passwords before calling Firebase', async () => {
@@ -93,5 +93,28 @@ describe('auth pages', () => {
       }),
     )
     expect(await screen.findByRole('heading', { name: /prepare campaigns for real support/i })).toBeInTheDocument()
+  })
+
+  it('shows an actionable error and re-enables Create Account when registration fails', async () => {
+    const user = userEvent.setup()
+    registerWithEmail.mockRejectedValue({ code: 'auth/network-request-failed' })
+    window.history.pushState({}, '', '/register')
+
+    render(
+      <AppProviders>
+        <App />
+      </AppProviders>,
+    )
+
+    const form = screen.getByRole('form', { name: /register form/i })
+
+    await user.type(within(form).getByLabelText(/name/i), 'Asha Bloom')
+    await user.type(within(form).getByLabelText(/email/i), 'asha@example.com')
+    await user.type(within(form).getByLabelText(/^password$/i), 'Strong1')
+    await user.click(within(form).getByRole('button', { name: /create account/i }))
+
+    expect(registerWithEmail).toHaveBeenCalledTimes(1)
+    expect(await screen.findByText(/could not reach the authentication service/i)).toBeInTheDocument()
+    expect(within(form).getByRole('button', { name: /create account/i })).toBeEnabled()
   })
 })
