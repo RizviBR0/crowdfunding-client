@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { ArrowUpRight, LayoutDashboard, LogOut, Menu, UserCircle, WalletCards, X } from 'lucide-react'
+import { ArrowUpRight, LayoutDashboard, LogOut, Menu, WalletCards, X } from 'lucide-react'
 import BrandLogo from '../brand/BrandLogo.jsx'
 import Button from '../ui/Button.jsx'
+import UserAvatar from '../ui/UserAvatar.jsx'
 import { siteConfig } from '../../config/site.js'
 
 function PublicNavbar({ viewer = null, onLogout }) {
@@ -31,7 +32,7 @@ function PublicNavbar({ viewer = null, onLogout }) {
                 <span>{viewer.credits ?? 0} credits</span>
               </Link>
               <Link className="site-nav__profile" to="/dashboard">
-                {viewer.photoUrl ? <img alt="" src={viewer.photoUrl} /> : <UserCircle aria-hidden="true" />}
+                <UserAvatar user={viewer} />
                 <span>{viewer.displayName || 'Dashboard'}</span>
               </Link>
               <Button icon={LogOut} onClick={onLogout} variant="ghost">

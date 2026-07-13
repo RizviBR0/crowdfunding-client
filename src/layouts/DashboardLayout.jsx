@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Bell, LogOut, Menu, UserCircle, WalletCards, X } from 'lucide-react'
+import { Bell, LogOut, Menu, WalletCards, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth.js'
 import BrandLogo from '../components/brand/BrandLogo.jsx'
 import Button from '../components/ui/Button.jsx'
+import UserAvatar from '../components/ui/UserAvatar.jsx'
 import { siteConfig } from '../config/site.js'
 import { getApiErrorMessage } from '../lib/api.js'
 import { getNotifications, markAllNotificationsRead, markNotificationRead } from '../services/notificationService.js'
@@ -59,7 +60,7 @@ function DashboardLayout() {
             <NotificationMenu isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
             </div>
             <div className="dashboard-user">
-              {user?.photoUrl ? <img alt="" src={user.photoUrl} /> : <UserCircle aria-hidden="true" />}
+              <UserAvatar user={user} />
               <span>
                 <strong>{user?.displayName || 'FundBloom member'}</strong>
                 <small>{user?.role || 'member'}</small>
