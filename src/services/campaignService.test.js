@@ -13,6 +13,7 @@ import {
   getAdminCampaigns,
   getCreatorCampaigns,
   getCreatorPendingContributions,
+  listSupporterOwnedContributions,
   suspendAdminCampaign,
   updateCampaign,
 } from './campaignService.js'
@@ -221,6 +222,26 @@ describe('campaign service', () => {
         },
       },
     )
+  })
+
+  it('omits the all-status filter because the API treats an absent status as all', async () => {
+    apiClient.get.mockResolvedValue({
+      data: {
+        data: { contributions: [{ id: 'contribution_1', status: 'pending' }] },
+        meta: { page: 1, totalItems: 1 },
+      },
+    })
+
+    await expect(
+      listSupporterOwnedContributions({ status: 'all', page: 1, limit: 10 }),
+    ).resolves.toEqual({
+      contributions: [{ id: 'contribution_1', status: 'pending' }],
+      meta: { page: 1, totalItems: 1 },
+    })
+
+    expect(apiClient.get).toHaveBeenCalledWith('/supporter/contributions', {
+      params: { page: 1, limit: 10 },
+    })
   })
 
   it('loads and mutates admin campaign records', async () => {

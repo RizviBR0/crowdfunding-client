@@ -9,8 +9,9 @@ import CreatorCampaignPage from './pages/CreatorCampaignPage.jsx'
 import CreatorWithdrawalsPage, { CreatorPaymentsPage } from './pages/CreatorWithdrawalsPage.jsx'
 import ExplorePage, { CampaignDetailPage } from './pages/ExplorePage.jsx'
 import HomePage from './pages/HomePage.jsx'
+import HowItWorksPage from './pages/HowItWorksPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
-import PlaceholderPage from './pages/PlaceholderPage.jsx'
+import StoriesPage from './pages/StoriesPage.jsx'
 import SupporterContributionsPage from './pages/SupporterContributionsPage.jsx'
 import SupporterCreditsPage from './pages/SupporterCreditsPage.jsx'
 import SupporterPaymentsPage from './pages/SupporterPaymentsPage.jsx'
@@ -27,8 +28,8 @@ function App() {
         <Route index element={<HomePage />} />
         <Route element={<ExplorePage />} path="explore" />
         <Route element={<CampaignDetailPage />} path="campaigns/:campaignId" />
-        <Route element={<PlaceholderPage type="howItWorks" />} path="how-it-works" />
-        <Route element={<PlaceholderPage type="stories" />} path="stories" />
+        <Route element={<HowItWorksPage />} path="how-it-works" />
+        <Route element={<StoriesPage />} path="stories" />
         <Route element={<GuestRoute />}>
           <Route element={<AuthPage mode="login" />} path="login" />
           <Route element={<AuthPage mode="register" />} path="register" />

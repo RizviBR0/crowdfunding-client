@@ -162,8 +162,12 @@ export const listSupporterApprovedContributions = async ({ page, limit }) => {
 }
 
 export const listSupporterOwnedContributions = async ({ status, page, limit }) => {
+  const params = { page, limit }
+
+  if (status && status !== 'all') params.status = status
+
   const response = await apiClient.get('/supporter/contributions', {
-    params: { status, page, limit },
+    params,
   })
 
   return {
