@@ -39,8 +39,8 @@ function PublicNavbar({ viewer = null, onLogout }) {
         <div className="site-nav__actions">
           {isLoggedIn ? (
             <>
-              {viewer?.role === 'supporter' && (
-                <Link className="dashboard-credit" to="/dashboard/supporter/credits" style={{ textDecoration: 'none' }}>
+              {(viewer?.role === 'supporter' || viewer?.role === 'creator') && (
+                <Link className="dashboard-credit" to={viewer?.role === 'creator' ? '/dashboard/creator/withdrawals' : '/dashboard/supporter/credits'} style={{ textDecoration: 'none' }}>
                   <WalletCards aria-hidden="true" size={16} />
                   <span>{viewer.credits ?? 0} credits</span>
                 </Link>
@@ -64,8 +64,8 @@ function PublicNavbar({ viewer = null, onLogout }) {
                     <LayoutDashboard aria-hidden="true" size={16} />
                     <span>Dashboard</span>
                   </Link>
-                  {viewer?.role === 'supporter' && (
-                    <Link className="user-dropdown__item" to="/dashboard/supporter/credits" onClick={() => setIsProfileMenuOpen(false)}>
+                  {(viewer?.role === 'supporter' || viewer?.role === 'creator') && (
+                    <Link className="user-dropdown__item" to={viewer?.role === 'creator' ? '/dashboard/creator/withdrawals' : '/dashboard/supporter/credits'} onClick={() => setIsProfileMenuOpen(false)}>
                       <WalletCards aria-hidden="true" size={16} />
                       <span>{viewer.credits ?? 0} credits</span>
                     </Link>
@@ -119,8 +119,8 @@ function PublicNavbar({ viewer = null, onLogout }) {
                 <LayoutDashboard aria-hidden="true" />
                 Dashboard
               </Link>
-              {viewer?.role === 'supporter' && (
-                <Link className="mobile-menu__link" onClick={closeMenu} to="/dashboard/supporter/credits">
+              {(viewer?.role === 'supporter' || viewer?.role === 'creator') && (
+                <Link className="mobile-menu__link" onClick={closeMenu} to={viewer?.role === 'creator' ? '/dashboard/creator/withdrawals' : '/dashboard/supporter/credits'}>
                   <WalletCards aria-hidden="true" />
                   {viewer.credits ?? 0} available credits
                 </Link>

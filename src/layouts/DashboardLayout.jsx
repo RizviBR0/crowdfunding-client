@@ -49,8 +49,8 @@ function DashboardLayout() {
           <BrandLogo />
 
           <div className="dashboard-header__meta">
-            {user?.role === 'supporter' && (
-              <Link className="dashboard-credit" to="/dashboard/supporter/credits" style={{ textDecoration: 'none' }}>
+            {(user?.role === 'supporter' || user?.role === 'creator') && (
+              <Link className="dashboard-credit" to={user?.role === 'creator' ? '/dashboard/creator/withdrawals' : '/dashboard/supporter/credits'} style={{ textDecoration: 'none' }}>
                 <WalletCards aria-hidden="true" />
                 {user.credits ?? 0} credits
               </Link>
